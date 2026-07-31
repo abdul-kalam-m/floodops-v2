@@ -1,0 +1,28 @@
+[project]
+name = "floodops-v2-pipeline"
+version = "0.1.0"
+description = "FloodOps V2 data pipeline: recon, fetch, exposure engine, validate (OPERATING_GUIDE.md §6.1)"
+requires-python = ">=3.11"
+# 00_recon.py is intentionally stdlib-only so recon runs with no dependency install.
+# No DEM/rasterio here (unlike v1) -- V2 is extent-only, no depth computation (locked, §2.2).
+dependencies = [
+    "requests>=2.32",
+    "shapely>=2.0",
+    "pyproj>=3.6",
+    "pyogrio>=0.9",
+    "geopandas>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

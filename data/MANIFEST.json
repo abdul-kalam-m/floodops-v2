@@ -1,0 +1,13 @@
+{
+  "_comment": "Data lineage per OPERATING_GUIDE.md \u00a74.2. One entry per fetched artifact. Written by pipeline stages.",
+  "artifacts": [
+    {
+      "name": "cie_service_metadata",
+      "source_url": "https://services1.arcgis.com/ze0XBzU1FXj94DJq/arcgis/rest/services/RU_NJ_CIE_Full/FeatureServer",
+      "retrieved_utc": "2026-07-31T17:58:03.197844+00:00",
+      "sha256": null,
+      "local_path": null,
+      "license_note": "Rutgers NJAES / public research product"
+    }
+  ]
+}

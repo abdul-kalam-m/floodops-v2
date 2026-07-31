@@ -1,0 +1,13 @@
+{
+  "name": "floodops-v2",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Multi-town coastal flood exposure dashboard (New Jersey) — separate from FloodOps v1",
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "web": "pnpm --filter @floodops-v2/web"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

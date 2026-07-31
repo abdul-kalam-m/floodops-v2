@@ -1,0 +1,20 @@
+# FloodOps V2 — see OPERATING_GUIDE.md §4.2, §10.2
+# Raw data is never committed (regenerable; large). Processed web outputs ARE committed.
+data/raw/
+data/processed/*.gpkg
+
+# Python / uv
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Node / web
+node_modules/
+web/dist/
+.DS_Store
+
+# Local env
+*.local
+.env
