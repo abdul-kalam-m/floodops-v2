@@ -1,0 +1,152 @@
+{
+  "town": "Hoboken",
+  "slug": "hoboken",
+  "county": "HUDSON",
+  "state": "NJ",
+  "levels": [
+    {
+      "level_ft": 1,
+      "files": {
+        "exposure": "levels/exposure_1.json",
+        "extent": "levels/extent_1.geojson"
+      }
+    },
+    {
+      "level_ft": 2,
+      "files": {
+        "exposure": "levels/exposure_2.json",
+        "extent": "levels/extent_2.geojson"
+      }
+    },
+    {
+      "level_ft": 3,
+      "files": {
+        "exposure": "levels/exposure_3.json",
+        "extent": "levels/extent_3.geojson"
+      }
+    },
+    {
+      "level_ft": 4,
+      "files": {
+        "exposure": "levels/exposure_4.json",
+        "extent": "levels/extent_4.geojson"
+      }
+    },
+    {
+      "level_ft": 5,
+      "files": {
+        "exposure": "levels/exposure_5.json",
+        "extent": "levels/extent_5.geojson"
+      }
+    },
+    {
+      "level_ft": 6,
+      "files": {
+        "exposure": "levels/exposure_6.json",
+        "extent": "levels/extent_6.geojson"
+      }
+    },
+    {
+      "level_ft": 7,
+      "files": {
+        "exposure": "levels/exposure_7.json",
+        "extent": "levels/extent_7.geojson"
+      }
+    },
+    {
+      "level_ft": 8,
+      "files": {
+        "exposure": "levels/exposure_8.json",
+        "extent": "levels/extent_8.geojson"
+      }
+    },
+    {
+      "level_ft": 9,
+      "files": {
+        "exposure": "levels/exposure_9.json",
+        "extent": "levels/extent_9.geojson"
+      }
+    },
+    {
+      "level_ft": 10,
+      "files": {
+        "exposure": "levels/exposure_10.json",
+        "extent": "levels/extent_10.geojson"
+      }
+    },
+    {
+      "level_ft": 11,
+      "files": {
+        "exposure": "levels/exposure_11.json",
+        "extent": "levels/extent_11.geojson"
+      }
+    },
+    {
+      "level_ft": 12,
+      "files": {
+        "exposure": "levels/exposure_12.json",
+        "extent": "levels/extent_12.geojson"
+      }
+    },
+    {
+      "level_ft": 13,
+      "files": {
+        "exposure": "levels/exposure_13.json",
+        "extent": "levels/extent_13.geojson"
+      }
+    },
+    {
+      "level_ft": 14,
+      "files": {
+        "exposure": "levels/exposure_14.json",
+        "extent": "levels/extent_14.geojson"
+      }
+    },
+    {
+      "level_ft": 15,
+      "files": {
+        "exposure": "levels/exposure_15.json",
+        "extent": "levels/extent_15.geojson"
+      }
+    },
+    {
+      "level_ft": 16,
+      "files": {
+        "exposure": "levels/exposure_16.json",
+        "extent": "levels/extent_16.geojson"
+      }
+    },
+    {
+      "level_ft": 17,
+      "files": {
+        "exposure": "levels/exposure_17.json",
+        "extent": "levels/extent_17.geojson"
+      }
+    },
+    {
+      "level_ft": 18,
+      "files": {
+        "exposure": "levels/exposure_18.json",
+        "extent": "levels/extent_18.geojson"
+      }
+    },
+    {
+      "level_ft": 19,
+      "files": {
+        "exposure": "levels/exposure_19.json",
+        "extent": "levels/extent_19.geojson"
+      }
+    },
+    {
+      "level_ft": 20,
+      "files": {
+        "exposure": "levels/exposure_20.json",
+        "extent": "levels/extent_20.geojson"
+      }
+    }
+  ],
+  "hazard_source": "Rutgers NJ Coastal Inundation Explorer (RU_NJ_CIE_Full)",
+  "fim_mode": "extent-only",
+  "roads_encoding": "sparse-closed-only",
+  "generated_utc": "2026-07-31T22:12:42.726102+00:00"
+}

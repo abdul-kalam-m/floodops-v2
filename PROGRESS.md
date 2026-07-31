@@ -4,6 +4,91 @@ Newest entry on top. Never delete entries. Format per OPERATING_GUIDE.md §13.5 
 
 ---
 
+## 2026-07-31 — Phase 2: Hazard acquisition + exposure engine (agent: sonnet-5)
+
+**Done — all 8 towns, all 20 levels each (160 town×level combinations):**
+- `04_fetch_hazard.py`: per town × covered level, fetch CIE main + low-lying extent
+  (filtered `MUN=`), union, `buffer(0)`, reproject to UTM. Wrote
+  `data/raw/hazard/{slug}/extent_{level}.geojson` (gitignored, mirrors v1's
+  `data/raw/fim/` convention). Validated on the two extremes first (Newark = worst-case
+  size, Hoboken = smallest) before running all 8 — both monotonic, both physically
+  plausible (Hoboken 0.14→3.23 km² of its 5.1 km² total; Newark 5.6→36.1 km² of 67.0 km²).
+  All 8 towns: monotonic area growth confirmed.
+- `05_build_exposure.py`: §5.3 (3-tier facility status) / §5.4 (2-tier road status) /
+  §5.5 (120 m access-adjacency, same pattern as v1) exposure engine. Writes per-level
+  `exposure_{level}.json` + `extent_{level}.geojson`, per-town `index.json` +
+  `first_exposed.json` + rounded `assets/roads/boundary.geojson`, and the top-level
+  `towns.json` registry.
+- `09_validate.py`: §12.1 invariants generalized across all 8 towns (files exist/parse,
+  gzip budgets, EPSG:4326 + valid geometries + unique ids, status-vocabulary validity,
+  monotonic severity across levels for every asset AND every road, `first_exposed.json`
+  consistency). **Final result: 1490/1490 checks pass, 0 failures.**
+- `pipeline/tests/test_pipeline.py`: +1 regression test (degenerate zero-length line
+  handling, see below). 14 tests total pass.
+
+**Three real problems found and fixed during this phase — none were assumptions I let
+slide, each verified before and after (§13.2 decisions):**
+
+1. **Extent-polygon size.** Newark's raw single-level extent (Phase 0 flagged ~54.7k
+   vertices at 20 ft) produced per-level files up to 826 KB raw — over the 800 KB/file
+   budget as originally read. Tested simplification tolerance empirically (2/5/10/12/15/
+   20/30/50 m on Newark's densest levels) rather than guessing: **locked `SIMPLIFY_M =
+   15.0`** — every per-level file ≤ ~270 KB raw, area distortion < 1%, negligible next to
+   the hazard model's own uncertainty.
+
+2. **Budget methodology was measuring the wrong thing.** Even after tolerance-tuning,
+   Newark's `roads.geojson` (11,142 segments, by far the densest network in the set) sat
+   at 3.3 MB raw — still "over budget" by a literal reading of §7.4. Root cause: raw
+   on-disk byte count was never the right metric — v1's own guide already measures its
+   JS-bundle budget in **gzip-compressed** size (§8.7 there), and this project's §7.4
+   should have matched that from the start. Measured real gzip transfer size directly:
+   Newark's roads.geojson compresses 9.2× (3.3 MB → 360 KB gzip), comfortably under
+   budget. **Corrected §7.4 in the guide to explicitly specify gzip-measured budgets**
+   (owner-confirmed, 2026-07-31) rather than quietly redefining pass/fail without
+   updating the source document. Also trimmed two client-unneeded properties
+   (`osm_way`, `length_m`) from the web-facing `roads.geojson` as a free, correctness-
+   preserving bonus. **Final, worst-case town (Newark): 1052.8 KB gzip total (budget 5
+   MB), 306.3 KB max file gzip (budget 800 KB)** — genuine margin, not a near-miss.
+
+3. **Degenerate road geometries — a real Phase 1 bug, caught by Phase 2's validator, in
+   two rounds.** `09_validate.py`'s geometry-validity check failed for several towns'
+   `roads.geojson`. Root cause round 1: some OSM ways have two adjacent nodes at
+   identical coordinates (a real OSM editing artifact); `split_line()` (§6.1,
+   `03_fetch_roads.py`) faithfully preserved that as a zero-length, degenerate
+   `LineString([p, p])` instead of being filtered. Fixed with a `seg.length <= 0` guard
+   — this cleared 7 of 8 affected towns, but **3 towns still failed** after re-running
+   the full chain. Root cause round 2 (traced by direct inspection of the specific
+   failing feature, not assumption): some segments were *technically* > 0 length in the
+   source (~1×10⁻⁸ degrees — floating-point noise from the UTM↔WGS84 round-trip) but
+   collapsed to a degenerate, invalid geometry once `05_build_exposure.py`'s
+   `simplify(1 m)` ran on them. **Revised the guard to a real-world epsilon,
+   `MIN_SEG_LEN_M = 0.5`** (no genuine road segment is meaningfully shorter than half a
+   meter) instead of a strict zero comparison. Added a regression test
+   (`test_split_line_degenerate_zero_length_input`) documenting both the raw
+   `split_line()` behavior and the guard threshold. Re-ran `03_fetch_roads.py` →
+   `05_build_exposure.py` → `09_validate.py` a final time: **0 invalid geometries
+   anywhere, 0 validator failures.**
+
+**Also fixed in passing:** tried `COORD_ROUND = 5` (vs. v1's 6) for a small extra size
+cut — it collapsed 6 of Newark's shortest segments (plus one New Brunswick boundary
+ring) into duplicate-point geometries. The saving was ~2%; reverted to 6 decimals
+(v1's known-safe value) rather than keep chasing a marginal gain against real geometry
+risk.
+
+**Repository copy of the guide (`OPERATING_GUIDE.md` in this repo's root) re-synced from
+the canonical portfolio copy after the §2.1/§3.1/§7.4 edits (1 ft steps, gzip budget).**
+
+**⚠ Deviations / open items:** still no GitHub remote (mirrors Phase 0/1's situation) —
+committed locally only.
+
+**Next:** Phase 3 — dashboard shell (Vite + React + TS + Tailwind v4 + MapLibre,
+multi-town): `TownPicker`, `MapView` adapted for single-class exposure fill (no depth
+ramp), `LevelSlider` (replaces v1's `StageSlider`, ticks = that town's actual available
+levels). Exit: switching towns fully reloads correct data with zero stale-town
+artifacts; deployed preview on a **new**, separate Cloudflare Pages project.
+
+---
+
 ## 2026-07-31 — Phase 1: Town + asset + road acquisition (agent: sonnet-5)
 
 **Done — all 8 towns from the recon-locked registry (§13.3, `floodops_v2_lib.TOWN_REGISTRY`,

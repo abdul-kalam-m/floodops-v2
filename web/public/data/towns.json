@@ -1,0 +1,122 @@
+[
+  {
+    "slug": "newark",
+    "name": "Newark",
+    "mun": "NEWARK CITY",
+    "center": [
+      40.72447,
+      -74.17254
+    ],
+    "bbox": [
+      -74.25136,
+      40.67437,
+      -74.11279,
+      40.78827
+    ]
+  },
+  {
+    "slug": "hoboken",
+    "name": "Hoboken",
+    "mun": "HOBOKEN CITY",
+    "center": [
+      40.74521,
+      -74.02811
+    ],
+    "bbox": [
+      -74.04387,
+      40.73039,
+      -74.01425,
+      40.75898
+    ]
+  },
+  {
+    "slug": "jersey-city",
+    "name": "Jersey City",
+    "mun": "JERSEY CITY",
+    "center": [
+      40.71163,
+      -74.0649
+    ],
+    "bbox": [
+      -74.11706,
+      40.66163,
+      -74.02064,
+      40.76899
+    ]
+  },
+  {
+    "slug": "atlantic-city",
+    "name": "Atlantic City",
+    "mun": "ATLANTIC CITY",
+    "center": [
+      39.37756,
+      -74.45156
+    ],
+    "bbox": [
+      -74.50159,
+      39.33554,
+      -74.40405,
+      39.41768
+    ]
+  },
+  {
+    "slug": "new-brunswick",
+    "name": "New Brunswick",
+    "mun": "NEW BRUNSWICK CITY",
+    "center": [
+      40.48705,
+      -74.44507
+    ],
+    "bbox": [
+      -74.48949,
+      40.46724,
+      -74.39228,
+      40.50932
+    ]
+  },
+  {
+    "slug": "perth-amboy",
+    "name": "Perth Amboy",
+    "mun": "PERTH AMBOY CITY",
+    "center": [
+      40.5197,
+      -74.27069
+    ],
+    "bbox": [
+      -74.2917,
+      40.49451,
+      -74.24602,
+      40.54352
+    ]
+  },
+  {
+    "slug": "camden",
+    "name": "Camden",
+    "mun": "CAMDEN CITY",
+    "center": [
+      39.93616,
+      -75.1074
+    ],
+    "bbox": [
+      -75.13632,
+      39.89856,
+      -75.06655,
+      39.96948
+    ]
+  },
+  {
+    "slug": "bayonne",
+    "name": "Bayonne",
+    "mun": "BAYONNE CITY",
+    "center": [
+      40.66468,
+      -74.10933
+    ],
+    "bbox": [
+      -74.16144,
+      40.64199,
+      -74.04963,
+      40.70107
+    ]
+  }
+]

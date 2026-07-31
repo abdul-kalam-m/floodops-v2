@@ -87,6 +87,17 @@ def fetch_one_town(slug: str, town: str, force: bool) -> dict:
         clipped = line_utm.intersection(study_utm)
         for part in line_parts(clipped):
             for seg in split_line(part):
+                # Some OSM ways have two adjacent nodes at (near-)identical coordinates
+                # (a real data artifact, e.g. a duplicate node at a junction edit). A
+                # strict `<= 0` check isn't enough: floating-point noise from the
+                # UTM<->WGS84 round-trip can leave a segment technically >0 m (observed:
+                # ~1e-8 degrees, effectively noise) but still collapse to a degenerate,
+                # invalid LineString once 05_build_exposure.py's simplify(1 m) runs on
+                # it. No real road segment is meaningfully shorter than half a meter, so
+                # that's the threshold, not zero.
+                MIN_SEG_LEN_M = 0.5
+                if seg.length < MIN_SEG_LEN_M:
+                    continue
                 rows.append({
                     "id": f"{way['id']}-{len(rows)}",
                     "osm_way": way["id"],
