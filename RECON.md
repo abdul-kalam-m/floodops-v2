@@ -1,6 +1,6 @@
 # FloodOps V2 — Town Recon (RECON.md)
 
-Generated: 2026-07-31T17:58:03.198846+00:00 · auto-written by `pipeline/00_recon.py` (§3).
+Generated: 2026-07-31T18:38:11.069665+00:00 · auto-written by `pipeline/00_recon.py` (§3).
 
 Pass criteria: >= 3 of the 20 whole-foot levels (1-20 ft above MHHW) have non-empty features, AND the highest covered level reaches >= 5 ft.
 

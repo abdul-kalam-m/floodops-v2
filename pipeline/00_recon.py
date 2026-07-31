@@ -38,20 +38,11 @@ MIN_LEVELS_COVERED = 3       # need at least this many of the 20 levels non-empt
 MIN_TOP_LEVEL_FT = 5         # its highest covered level must reach at least this high
                              # (rules out towns with only a sliver of coverage at 1-2ft)
 
-# Ranked candidates (guide §3.2). MUN values must match the service's exact
-# uppercase + municipality-type-suffix convention (verified against the service
-# in an earlier session; Phase 0 re-derives the *set* of valid MUN values live
-# below as a cross-check, not just trusting this hardcoded string).
-CANDIDATES = [
-    ("Newark", "NEWARK CITY", "Anchor: airport, port, rail hub; confirmed full coverage"),
-    ("Hoboken", "HOBOKEN CITY", "Dense waterfront, famous Sandy flood history, small/compact"),
-    ("Jersey City", "JERSEY CITY", "Large waterfront city, PATH, Hudson + Newark Bay frontage"),
-    ("Atlantic City", "ATLANTIC CITY", "Open-ocean-facing -- different flood geometry"),
-    ("New Brunswick", "NEW BRUNSWICK CITY", "Raritan tidal limit; narrative link to FloodOps v1"),
-    ("Perth Amboy", "PERTH AMBOY CITY", "Raritan Bay confluence, historic coastal flooding"),
-    ("Camden", "CAMDEN CITY", "Delaware River waterfront -- different watershed, geographic diversity"),
-    ("Bayonne", "BAYONNE CITY", "Kill Van Kull/Newark Bay, industrial critical infrastructure"),
-]
+# Ranked candidates: imported from floodops_v2_lib.TOWN_REGISTRY (§3.2/§13.3), the
+# single source of truth every fetch script uses -- not redefined here. MUN values
+# must match the service's exact uppercase + municipality-type-suffix convention;
+# this script re-derives the *set* of valid MUN values live below as a cross-check,
+# not just trusting the registry's hardcoded strings.
 
 
 def main() -> int:
@@ -88,12 +79,12 @@ def main() -> int:
     print(f"  {len(known_muns)} distinct municipalities in the service.")
 
     candidates_out = []
-    for name, mun, note in CANDIDATES:
+    for slug, name, mun, note in fl.TOWN_REGISTRY:
         print(f"\nAssessing {name} (MUN='{mun}') ...")
         if mun not in known_muns:
             print(f"  [FAIL] '{mun}' not found among service MUN values -- check spelling.")
             candidates_out.append({
-                "town": name, "mun": mun, "note": note, "passes": False,
+                "town": name, "slug": slug, "mun": mun, "note": note, "passes": False,
                 "reason": "MUN value not found in service", "levels_covered": [],
             })
             continue
@@ -130,7 +121,7 @@ def main() -> int:
               f"(need >={MIN_LEVELS_COVERED} levels covered, top >={MIN_TOP_LEVEL_FT} ft)")
 
         candidates_out.append({
-            "town": name, "mun": mun, "note": note, "passes": passes,
+            "town": name, "slug": slug, "mun": mun, "note": note, "passes": passes,
             "levels_covered": covered, "complexity": complexity,
         })
 

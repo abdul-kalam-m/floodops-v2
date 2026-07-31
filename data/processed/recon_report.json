@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-07-31T17:58:03.198846+00:00",
+  "generated_utc": "2026-07-31T18:38:11.069665+00:00",
   "hazard_source": "https://services1.arcgis.com/ze0XBzU1FXj94DJq/arcgis/rest/services/RU_NJ_CIE_Full/FeatureServer",
   "levels_ft_in_scope": [
     1,
@@ -28,6 +28,7 @@
   "candidates": [
     {
       "town": "Newark",
+      "slug": "newark",
       "mun": "NEWARK CITY",
       "note": "Anchor: airport, port, rail hub; confirmed full coverage",
       "passes": true,
@@ -62,6 +63,7 @@
     },
     {
       "town": "Hoboken",
+      "slug": "hoboken",
       "mun": "HOBOKEN CITY",
       "note": "Dense waterfront, famous Sandy flood history, small/compact",
       "passes": true,
@@ -96,6 +98,7 @@
     },
     {
       "town": "Jersey City",
+      "slug": "jersey-city",
       "mun": "JERSEY CITY",
       "note": "Large waterfront city, PATH, Hudson + Newark Bay frontage",
       "passes": true,
@@ -130,6 +133,7 @@
     },
     {
       "town": "Atlantic City",
+      "slug": "atlantic-city",
       "mun": "ATLANTIC CITY",
       "note": "Open-ocean-facing -- different flood geometry",
       "passes": true,
@@ -164,6 +168,7 @@
     },
     {
       "town": "New Brunswick",
+      "slug": "new-brunswick",
       "mun": "NEW BRUNSWICK CITY",
       "note": "Raritan tidal limit; narrative link to FloodOps v1",
       "passes": true,
@@ -198,6 +203,7 @@
     },
     {
       "town": "Perth Amboy",
+      "slug": "perth-amboy",
       "mun": "PERTH AMBOY CITY",
       "note": "Raritan Bay confluence, historic coastal flooding",
       "passes": true,
@@ -232,6 +238,7 @@
     },
     {
       "town": "Camden",
+      "slug": "camden",
       "mun": "CAMDEN CITY",
       "note": "Delaware River waterfront -- different watershed, geographic diversity",
       "passes": true,
@@ -266,6 +273,7 @@
     },
     {
       "town": "Bayonne",
+      "slug": "bayonne",
       "mun": "BAYONNE CITY",
       "note": "Kill Van Kull/Newark Bay, industrial critical infrastructure",
       "passes": true,

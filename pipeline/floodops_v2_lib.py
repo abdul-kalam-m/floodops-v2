@@ -53,6 +53,110 @@ WHOLE_FOOT_NAME_RE = re.compile(
 UA = "floodops-v2/1.0 (portfolio project; ar.abdulkalam.mustaq@gmail.com)"
 HEADERS = {"User-Agent": UA}
 
+# --- town registry (LOCKED §3.2/§13.3 — single source of truth; 00_recon.py and every
+# fetch script import this rather than each keeping their own copy of the town list) ---
+TOWN_REGISTRY = [
+    # (slug, town, mun, note)
+    ("newark", "Newark", "NEWARK CITY",
+     "Anchor: airport, port, rail hub; confirmed full coverage"),
+    ("hoboken", "Hoboken", "HOBOKEN CITY",
+     "Dense waterfront, famous Sandy flood history, small/compact"),
+    ("jersey-city", "Jersey City", "JERSEY CITY",
+     "Large waterfront city, PATH, Hudson + Newark Bay frontage"),
+    ("atlantic-city", "Atlantic City", "ATLANTIC CITY",
+     "Open-ocean-facing -- different flood geometry"),
+    ("new-brunswick", "New Brunswick", "NEW BRUNSWICK CITY",
+     "Raritan tidal limit; narrative link to FloodOps v1"),
+    ("perth-amboy", "Perth Amboy", "PERTH AMBOY CITY",
+     "Raritan Bay confluence, historic coastal flooding"),
+    ("camden", "Camden", "CAMDEN CITY",
+     "Delaware River waterfront -- different watershed, geographic diversity"),
+    ("bayonne", "Bayonne", "BAYONNE CITY",
+     "Kill Van Kull/Newark Bay, industrial critical infrastructure"),
+]
+
+STATE_FIPS = "34"  # New Jersey (§3, reused from v1's TIGERweb convention)
+
+
+# --- Census TIGERweb boundary (reused pattern from v1's 02_fetch_boundary.py) -
+TIGERWEB = ("https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/"
+            "Places_CouSub_ConCity_SubMCD/MapServer")
+
+
+def arcgis_geojson(base_url: str, layer_id: int, where: str, out_fields: str = "*",
+                   out_sr: int = WGS84, force: bool = False):
+    """Query an ArcGIS REST layer -> GeoDataFrame. TIGERweb's outSR has been verified
+    correct (v1 used it directly for Bound Brook with sane results) -- no CRS-detection
+    workaround needed here, unlike the coordinate-magnitude check v1 needed for NWS_FIM."""
+    import geopandas as gpd
+    js = get_json(f"{base_url}/{layer_id}/query", params={
+        "where": where, "outFields": out_fields, "returnGeometry": "true",
+        "outSR": out_sr, "f": "geojson"}, force=force)
+    feats = js.get("features", [])
+    if not feats:
+        raise ValueError(f"ArcGIS query returned 0 features [{base_url}/{layer_id}] {where}")
+    return gpd.GeoDataFrame.from_features(feats, crs=out_sr)
+
+
+def county_subdivision_layer(force: bool = False) -> int:
+    svc = get_json(TIGERWEB, params={"f": "json"}, force=force)
+    ids = [l["id"] for l in svc.get("layers", []) if l.get("name") == "County Subdivisions"]
+    if not ids:
+        raise RuntimeError("County Subdivisions layer not found in TIGERweb service.")
+    return min(ids)  # most recent vintage, same choice v1 made
+
+
+# Fixed 2026-07-31: a naive geometric 1 km buffer around a waterfront town's boundary can
+# reach across a river/bay into another state (confirmed: Hoboken's buffer pulled in a
+# Manhattan heliport 626 m across the Hudson; Camden's pulled in Philadelphia fire stations
+# and even Philadelphia's own Packer Ave Marine Terminal tagged as a "port"). The state
+# line (unlike a Euclidean buffer) already follows the legal river/bay boundary, so clipping
+# every town's study area to NJ's TIGERweb state polygon removes cross-state contamination
+# while preserving legitimate nearby-NJ-town assets (the buffer's actual intended purpose).
+STATE_LAYER = ("https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/"
+               "State_County/MapServer/0")
+_nj_boundary_cache = None
+
+
+def nj_boundary(force: bool = False):
+    """New Jersey's state polygon (EPSG:4326), cached in-process. Used to clip every
+    town's buffered study area so it never crosses a state line (§13.2 decision)."""
+    global _nj_boundary_cache
+    if _nj_boundary_cache is not None and not force:
+        return _nj_boundary_cache
+    import geopandas as gpd
+    js = get_json(f"{STATE_LAYER}/query", params={
+        "where": f"STATE='{STATE_FIPS}'", "outFields": "STATE",
+        "returnGeometry": "true", "outSR": WGS84, "f": "geojson"}, force=force)
+    gdf = gpd.GeoDataFrame.from_features(js["features"], crs=WGS84)
+    _nj_boundary_cache = gdf.union_all()
+    return _nj_boundary_cache
+
+
+# --- Overpass (OSM) -----------------------------------------------------------
+OVERPASS = "https://overpass-api.de/api/interpreter"
+
+
+def overpass(query: str, force: bool = False) -> dict:
+    """Run an Overpass QL query (cached). Retries/backoff via get_json's http layer."""
+    return get_json(OVERPASS, params={"data": query}, force=force, timeout=180)
+
+
+# --- elevation (informational only, §4.1 V5 -- NOT used in exposure math) ---
+def elevation_ft(lon: float, lat: float, force: bool = False) -> tuple[float, str]:
+    """Ground elevation in feet from USGS EPQS. No DEM fallback in V2 (no DEM fetched,
+    §2.2/§4.1 -- unlike v1). Returns (nan, "unavailable") if EPQS fails for a point."""
+    url = "https://epqs.nationalmap.gov/v1/json"
+    try:
+        js = get_json(url, params={"x": lon, "y": lat, "units": "Feet", "wkid": WGS84},
+                      force=force, retries=2, timeout=30)
+        val = float(js.get("value"))
+        if val > -1e5:
+            return round(val, 2), "epqs"
+    except Exception:  # noqa: BLE001
+        pass
+    return float("nan"), "unavailable"
+
 
 # --- http (cached + retried) -------------------------------------------------
 def _cache_path(url: str, params: dict | None, suffix: str) -> Path:

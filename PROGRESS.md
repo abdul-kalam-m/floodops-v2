@@ -4,6 +4,86 @@ Newest entry on top. Never delete entries. Format per OPERATING_GUIDE.md §13.5 
 
 ---
 
+## 2026-07-31 — Phase 1: Town + asset + road acquisition (agent: sonnet-5)
+
+**Done — all 8 towns from the recon-locked registry (§13.3, `floodops_v2_lib.TOWN_REGISTRY`,
+proceeding with the full 8 per owner instruction, not the guide's "aim for 4-5" suggestion):**
+- `01_fetch_towns.py`: boundary + 1 km study area per town (Census TIGERweb County
+  Subdivisions, `BASENAME=<town> AND STATE='34'`, exactly one match each — no ambiguous
+  names in this set). Boundary areas cross-checked against known real-world figures:
+  Newark 66.996 km² (actual ≈67.6), Hoboken 5.1 km² (actual ≈5.1), Jersey City 54.44 km²
+  (actual ≈54.4), Perth Amboy 15.429 km² (actual ≈15.3) — all close matches, high confidence
+  these are the correct municipal polygons.
+- `02_fetch_assets.py`: OSM/Overpass critical-facility fetch, v1's 9 categories + **`airport`
+  (`aeroway=aerodrome`) and `port` (`industrial=port`, `landuse=harbour` fallback)** — both
+  tags verified live against Newark before writing the category list. **Newark exit
+  criterion met: 1 airport (Newark Liberty Intl, IATA EWR) + 4 port facilities (Port Newark
+  Container Terminal, Maher Terminals, APM Terminals, Port Newark-Elizabeth relation), all
+  with EPQS elevations, all confirmed geographically inside Newark/Port Newark-Elizabeth
+  (not a Brooklyn Red Hook mismatch — checked coordinates directly).**
+- `03_fetch_roads.py`: OSM road network, segmented ≤200 m, `is_priority` flag — same logic
+  as v1, parameterized per town.
+- **Totals across all 8 towns: 790 assets, 32,308 road segments.** Per-town counts in
+  `RECON.md`-adjacent script output; full breakdown available via `data/processed/{slug}/`.
+- Added `pipeline/tests/test_pipeline.py` (6 tests: categorize() incl. new airport/port
+  cases, town-registry slug uniqueness, split_line). 13 tests total pass.
+- **Refactor:** moved the town list out of `00_recon.py` into
+  `floodops_v2_lib.TOWN_REGISTRY` (single source of truth, now includes `slug`) before
+  writing the fetch scripts, to avoid two copies of the same list drifting apart. Re-ran
+  `00_recon.py` after the refactor — identical 8/8 result, confirms it wasn't a behavior
+  change.
+
+**Significant finding + fix (§13.2 decision) — cross-state contamination in the naive 1 km
+buffer:**
+- Initial asset fetch (before the fix) pulled in **53 of 843 assets (~6.3%) that were
+  genuinely in a different state**, not New Jersey: 5 in Manhattan (Hoboken, incl. a
+  heliport 626 m across the Hudson from Hoboken's shore), 11 in Manhattan (Jersey City), 1
+  in Staten Island (Perth Amboy), 15 in Philadelphia (Camden — **including Philadelphia's
+  own Packer Avenue Marine Terminal mis-tagged into Camden's "port" category**), and 21 in
+  Staten Island (Bayonne, incl. multiple NYPD/FDNY units and NYC public schools). Newark,
+  Atlantic City, and New Brunswick were unaffected (0 out of NJ each) — their buffers never
+  reached another state.
+- **Root cause:** the 1 km study-area buffer is a naive Euclidean buffer around the town
+  polygon; it has no concept of a river or bay being in the way, so for a waterfront town
+  close to another major urban core (Hoboken/Jersey City ↔ Manhattan; Camden ↔ Philadelphia;
+  Bayonne/Perth Amboy ↔ Staten Island) it can geometrically reach across the water into a
+  different state. v1's guide never had to confront this because Bound Brook has no
+  immediately-adjacent out-of-state urban area within 1 km.
+- **Fix:** added `floodops_v2_lib.nj_boundary()` (fetches + caches NJ's official TIGERweb
+  state polygon) and clip every town's buffered study area to it in `01_fetch_towns.py`
+  (`study_geom = buffer(...).intersection(nj_boundary)`), before it's written to
+  `study_area.geojson` — every downstream script (assets, roads) inherits the fix
+  automatically since they all read that one file. Deliberately **not** a blanket
+  "exclude anything outside the town's own polygon" fix: legitimate nearby-**NJ**-town
+  assets within the buffer are still included (matches v1's own intended use of the
+  buffer — e.g. mutual-aid-relevant facilities just over a municipal line stay in scope);
+  only cross-**state**-line contamination is removed, because the state line is the
+  actual, legally-correct river/bay boundary, not a guess.
+- **Re-verified end-to-end after the fix: 0 of 790 assets outside NJ, 0.0000% of road
+  length outside NJ (checked directly, not assumed)** for all 8 towns, including the 3
+  towns whose buffer had to shrink (Hoboken 17.6→13.2 km², Jersey City 89.6→79.8,
+  Perth Amboy 34.5→28.0, Camden 55.2→46.1, Bayonne 57.6→44.9 km²; Newark/Atlantic
+  City/New Brunswick unchanged, confirming they were never affected).
+
+**⚠ Deviations / open items:**
+- Still no GitHub remote (mirrors Phase 0's situation) — committed locally only.
+- Re-fetching assets after the fix used `--force` (broader than the minimal necessary
+  re-fetch — only the 5 affected towns' Overpass queries and EPQS lookups strictly needed
+  to re-run, since their bbox changed; the other 3 towns' cached results were already
+  correct). Cost extra time, not correctness — noted so a future session doesn't assume
+  `--force` is the normal way to pick up a study-area change; `--only <affected-slugs>`
+  without `--force` would have relied on the changed bbox naturally producing a new cache
+  key for just those towns.
+
+**Next:** Phase 2 — hazard acquisition + exposure engine (`04_fetch_hazard.py`,
+`05_build_exposure.py`, `09_validate.py`): per town × per available whole-foot level,
+fetch+union the main/low-lying CIE extent, compute §5.3/§5.4 exposure statuses, write the
+§7 web data contracts. Newark's worst-case per-level geometry (54.7k vertices at 20 ft,
+confirmed in Phase 0 recon) will need real simplification — verify empirically per town,
+per the guide's explicit warning not to assume v1's Bound Brook tolerance transfers.
+
+---
+
 ## 2026-07-31 — Phase 0: Bootstrap + recon (agent: sonnet-5)
 
 **Done:**
