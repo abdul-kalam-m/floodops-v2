@@ -4,6 +4,41 @@ Newest entry on top. Never delete entries. Format per OPERATING_GUIDE.md §13.5 
 
 ---
 
+## 2026-08-01 — Deploy pipeline: Workers static assets, not classic Pages (owner + agent)
+
+**Finding:** the Cloudflare project the owner created for V2 is on Cloudflare's newer
+**Workers** git-integration pipeline (build command + explicit `wrangler deploy`/
+`wrangler versions upload` steps), not the classic **Pages** pipeline v1 uses (build
+command + output directory only, no deploy command, no wrangler config at all). This
+repo has no `wrangler.toml`/`.jsonc`, same as v1, which is why the first deploy attempt
+failed outright ("application detection... run in the root of a workspace instead of
+targeting a specific project").
+
+**Fixed:**
+1. Added `wrangler.jsonc` (repo root, `assets.directory: "./web/dist"`, assets-only
+   Worker, no script) — verified locally with `wrangler deploy --dry-run` (no Cloudflare
+   auth needed for that check), which correctly read all files from `web/dist`.
+2. Git integration itself was also disconnected (separate issue, likely the GitHub App's
+   "selected repositories" scope never included this freshly-created repo) — owner
+   fixed via Cloudflare's "Connect to a repository" flow.
+3. **`web/public/_redirects` (the SPA-fallback file, same pattern as v1) had to be
+   removed entirely.** Workers static assets has its own automatic `.html`/`/index`
+   handling that collides with a catch-all `_redirects` rule (`/* /index.html 200`):
+   Cloudflare's deploy-time linter rejects it outright as an infinite loop (`Line 5:
+   Infinite loop detected... code: 100324`), a hard failure, not a warning. This is a
+   genuine platform difference from classic Pages (v1's `_redirects` is fine there).
+   `wrangler.jsonc`'s `assets.not_found_handling: "single-page-application"` is the
+   correct, native replacement for this deploy target — already configured in step 1 —
+   so no `_redirects` file is needed here at all. **If this project is ever migrated
+   back to classic Pages, `_redirects` would need to be re-added; don't assume the two
+   deploy targets are drop-in compatible.**
+
+**Next:** owner retries the deploy; if `/report` or `/methods` 404 on a direct load
+despite `not_found_handling`, that's the next thing to verify (untested in this
+session — dry-run only validates the config parses, not runtime routing behavior).
+
+---
+
 ## 2026-07-31 — Phases 3-5: Dashboard, simulator UX, reports (agent: sonnet-5)
 
 **Done:**
