@@ -75,7 +75,7 @@ Same as v1 (§1.3 there): hiring managers/reviewers primarily; NJ coastal-resili
 - No editing, migrating, or redeploying v1's `floodops` repo. It is not touched by this project.
 - No claim of operational readiness (same disclaimer discipline as v1, reworded for exposure-only semantics, §5.7).
 
-### 2.3 Stretch (only after Phase 7)
+### 2.3 Stretch (only after Phase 6)
 
 MHHW→NAVD88 depth upgrade (explicitly deferred, not cancelled — if the owner later wants true depths, that's a new phase built on top of this one, requiring the Rutgers MHHW surface or an equivalent tidal-datum grid); additional towns beyond the initial set; combining with v1/FloodScope's riverine model for towns that have both hazards.
 
