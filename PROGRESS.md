@@ -4,6 +4,80 @@ Newest entry on top. Never delete entries. Format per OPERATING_GUIDE.md §13.5 
 
 ---
 
+## 2026-08-01 — Add 0 ft (MHHW baseline) level (owner request, agent: sonnet-5)
+
+**Owner request:** add a 0 ft scenario. This reverses the 2026-07-22 exclusion of the
+CIE service's 0 ft (MHHW baseline) layer (§2.1) — locked levels are now **0–20 ft, 21
+levels**, not 1–20/20.
+
+**Feasibility check before touching anything:** queried the live `RU_NJ_CIE_Full`
+service metadata directly (all 84 layer names, not just the 0 ft pair) — confirmed the
+0 ft layer (ids 82/83, main + low-lying) is the *only* layer with a differently-worded
+suffix (`"... Coastal Inundation Extent (Mean Higher High Water)"` vs. every other
+whole-foot level's plain `"... Coastal Inundation Extent"`), and confirmed all 8 towns
+have real, non-empty 0 ft features (main count=1 everywhere; low-lying=1 for 6/8 towns,
+0 for New Brunswick/Perth Amboy — same "not every companion layer is non-empty
+everywhere" pattern already true at other levels, not a new problem class).
+
+**Changed:**
+- `floodops_v2_lib.py`: `LEVELS_FT` → `range(0, 21)`; `WHOLE_FOOT_NAME_RE` extended to
+  accept the optional `" (Mean Higher High Water)"` suffix. `test_recon.py`'s negative
+  test (`rejects_mhhw_baseline`) inverted to two positive tests (main + low-lying now
+  match, level 0). 15/15 tests pass.
+- Re-ran the full chain: `00_recon.py` (all 8 towns 21/21, range 0-20 ft, monotonic) →
+  `04_fetch_hazard.py` (21/21 levels fetched, area monotonic incl. the new 0 ft floor) →
+  `05_build_exposure.py` → `09_validate.py` (**1554/1554 checks pass**, up from 1490 at
+  20 levels).
+- Audited all of `web/src` for falsy-zero bugs before assuming the frontend "just
+  works" with `level_ft: 0` / `first_exposed: 0` — every consumer already used `??` or
+  `!= null` rather than truthy checks (no `if (level)`/`level || x` anywhere), so **no
+  frontend code changes were needed.** Verified live against real data anyway: Bayonne
+  has one facility (`Unnamed port`, ground elev **-5.3 ft** — physically sane, a
+  dock/pier below the tidal datum) already `exposed` at the 0 ft baseline itself;
+  confirmed `/report?town=bayonne&level=0` renders `1ST EXPOSED (FT): 0` correctly (not
+  blank, not "—"), confirmed the level slider's leftmost tick shows "0" not a dot, and
+  confirmed `prefetchNeighborLevels`'s `[idx-1, idx+1]` boundary logic at the new
+  minimum (idx=0) correctly skips the nonexistent "level -1" neighbor without erroring
+  (`levels[-1]` is `undefined` in JS, not a wraparound, so the existing `if (lvl)` guard
+  was already correct).
+- **Found + fixed a real, pre-existing pipeline bug while re-running `05_build_exposure.py`
+  a second time (unrelated to 0 ft, just newly surfaced by being the first re-run since
+  Phase 2):** every town's `roads.geojson`/`assets.geojson` were untouched, yet ~150
+  already-existing `exposure_{1-20}.json` files showed as git-modified with byte-identical
+  *content* (verified structurally) but fully different road-key **order**. Root cause:
+  `closed_ids = set(roads_utm.loc[closed_mask, "id"])` iterated a Python `set` of road-id
+  strings directly into the output dict — Python randomizes string-hash iteration order
+  per process, so every re-run reshuffled every level's road key order for every town,
+  pure diff noise with zero functional effect (assets were already safe: built via
+  `enumerate()` over a DataFrame, which is order-stable). Fixed by capturing a
+  DataFrame-ordered `list` first and building the sparse dict from that (keeping a real
+  `set` alongside for the O(1) access-lost membership check, so no performance cost).
+  **Proved the fix, didn't just assume it:** ran the full exposure build twice in a row
+  and diffed every output file between the two runs — the *only* difference anywhere
+  was each town's `index.json`'s `generated_utc` timestamp (expected); every
+  `exposure_*.json`/`extent_*.geojson`/`first_exposed.json` was byte-identical. Small,
+  unplanned bonus: naturally-ordered keys also gzip slightly smaller than hash-shuffled
+  ones (Newark: 1058.5 → 990.9 KB gzip total, still comfortably under the 5 MB budget).
+- Also fixed a cosmetic-only bug in `00_recon.py` found while re-running it: coverage
+  was printed/written as "X/20" (a leftover hardcoded literal from when there really
+  were only 20 levels) — now "21/21", computed from `len(fl.LEVELS_FT)` /
+  `report['levels_ft_in_scope']` rather than hardcoded, so it can't go stale again if
+  the level count ever changes once more.
+- `OPERATING_GUIDE.md` updated (§1.1 one-liner + comparison table, §2.1 scope, §3.1
+  verified facts incl. the 0 ft layer's naming exception, §5.1, §7.4) and re-synced to
+  the canonical portfolio copy (`6. PORTFOLIO/10. FLOODOPS V2/OPERATING_GUIDE.md`) —
+  confirmed identical before overwriting, not just assumed.
+- `web/` rebuilt: `tsc`/`eslint` clean (same pre-existing fast-refresh warning as
+  always), JS bundle unchanged at 276.58 KB gzip (data-only change, no code size
+  impact).
+
+**⚠ Deviations / open items:** none new. Same outstanding items as before this entry
+(owner needs to push, then redeploy on Cloudflare so the live site picks up the new 0 ft
+level — see the two entries below for the deploy-pipeline specifics already worked
+through).
+
+---
+
 ## 2026-08-01 — Deploy pipeline: Workers static assets, not classic Pages (owner + agent)
 
 **Finding:** the Cloudflare project the owner created for V2 is on Cloudflare's newer

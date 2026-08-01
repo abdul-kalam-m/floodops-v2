@@ -5,6 +5,13 @@
   "state": "NJ",
   "levels": [
     {
+      "level_ft": 0,
+      "files": {
+        "exposure": "levels/exposure_0.json",
+        "extent": "levels/extent_0.geojson"
+      }
+    },
+    {
       "level_ft": 1,
       "files": {
         "exposure": "levels/exposure_1.json",
@@ -148,5 +155,5 @@
   "hazard_source": "Rutgers NJ Coastal Inundation Explorer (RU_NJ_CIE_Full)",
   "fim_mode": "extent-only",
   "roads_encoding": "sparse-closed-only",
-  "generated_utc": "2026-07-31T22:20:34.235662+00:00"
+  "generated_utc": "2026-08-01T05:03:37.223066+00:00"
 }

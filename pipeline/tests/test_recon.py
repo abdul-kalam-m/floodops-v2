@@ -4,8 +4,8 @@ import re
 import floodops_v2_lib as fl
 
 
-def test_levels_ft_is_1_to_20_whole_feet():
-    assert fl.LEVELS_FT == list(range(1, 21))
+def test_levels_ft_is_0_to_20_whole_feet():
+    assert fl.LEVELS_FT == list(range(0, 21))
 
 
 def test_whole_foot_name_regex_matches_main():
@@ -30,12 +30,26 @@ def test_whole_foot_name_regex_rejects_half_foot():
     assert m is None
 
 
-def test_whole_foot_name_regex_rejects_mhhw_baseline():
-    # The 0 ft layer has a differently-worded suffix and is out of scope (§2.1).
+def test_whole_foot_name_regex_matches_mhhw_baseline_as_level_0():
+    # The 0 ft layer has a differently-worded suffix; owner-approved 2026-08-01 to
+    # bring it into scope as level 0 (reversing the original exclusion, §2.1).
     m = fl.WHOLE_FOOT_NAME_RE.match(
         "Rutgers NJ 0 ft. Coastal Inundation Extent (Mean Higher High Water)"
     )
-    assert m is None
+    assert m is not None
+    assert m.group(1) == "0"
+    assert m.group(2) is None  # main layer, no low-lying suffix
+
+
+def test_whole_foot_name_regex_matches_mhhw_baseline_low_lying_as_level_0():
+    # Real layer name has a trailing space after "Areas" -- \s*$ must tolerate it.
+    m = fl.WHOLE_FOOT_NAME_RE.match(
+        "Rutgers NJ 0 ft. Coastal Inundation Extent (Mean Higher High Water), "
+        "Low-Lying Areas "
+    )
+    assert m is not None
+    assert m.group(1) == "0"
+    assert m.group(2) == ", Low-Lying Areas"
 
 
 def test_count_vertices_simple_polygon():

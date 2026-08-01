@@ -111,11 +111,12 @@ def main() -> int:
             raw_kb = len(json.dumps(gj)) / 1024
             complexity = {"worst_level_ft": top, "n_features": n_feats,
                           "n_vertices": n_verts, "raw_geojson_kb": round(raw_kb, 1)}
-            print(f"  levels covered: {len(covered)}/20 (range {min(covered)}-{max(covered)} ft)")
+            print(f"  levels covered: {len(covered)}/{len(fl.LEVELS_FT)} "
+                  f"(range {min(covered)}-{max(covered)} ft)")
             print(f"  worst-case (level {top} ft): {n_feats} feature(s), "
                   f"{n_verts} vertices, {raw_kb:.1f} KB raw")
         else:
-            print("  levels covered: 0/20 -- no coastal exposure in this dataset")
+            print(f"  levels covered: 0/{len(fl.LEVELS_FT)} -- no coastal exposure in this dataset")
 
         print(f"  {'PASS' if passes else 'FAIL'} "
               f"(need >={MIN_LEVELS_COVERED} levels covered, top >={MIN_TOP_LEVEL_FT} ft)")
@@ -150,14 +151,17 @@ def main() -> int:
 
 
 def render_recon_md(report: dict) -> str:
+    levels_in_scope = report["levels_ft_in_scope"]
+    total_levels = len(levels_in_scope)
+    lo, hi = min(levels_in_scope), max(levels_in_scope)
     lines = [
         "# FloodOps V2 — Town Recon (RECON.md)",
         "",
         f"Generated: {report['generated_utc']} · auto-written by `pipeline/00_recon.py` (§3).",
         "",
-        f"Pass criteria: >= {report['min_levels_covered']} of the 20 whole-foot levels "
-        f"(1-20 ft above MHHW) have non-empty features, AND the highest covered level "
-        f"reaches >= {report['min_top_level_ft']} ft.",
+        f"Pass criteria: >= {report['min_levels_covered']} of the {total_levels} whole-foot "
+        f"levels ({lo}-{hi} ft above MHHW) have non-empty features, AND the highest covered "
+        f"level reaches >= {report['min_top_level_ft']} ft.",
         "",
         "## Candidate summary",
         "",
@@ -169,7 +173,7 @@ def render_recon_md(report: dict) -> str:
         rng = f"{min(c['levels_covered'])}-{max(c['levels_covered'])}" if c["levels_covered"] else "—"
         lines.append(
             f"| {c['town']} | {c['mun']} | {'✅' if c['passes'] else '❌'} | "
-            f"{len(c['levels_covered'])}/20 | {rng} | "
+            f"{len(c['levels_covered'])}/{total_levels} | {rng} | "
             f"{cx.get('worst_level_ft','—')} | {cx.get('n_features','—')} | "
             f"{cx.get('n_vertices','—')} | {cx.get('raw_geojson_kb','—')} |"
         )
@@ -190,7 +194,7 @@ def render_recon_md(report: dict) -> str:
     for c in report["candidates"]:
         if not c["passes"]:
             reason = c.get("reason") or (
-                f"only {len(c['levels_covered'])}/20 levels covered"
+                f"only {len(c['levels_covered'])}/{total_levels} levels covered"
                 if c["levels_covered"] else "zero coastal exposure in this dataset"
             )
             lines.append(f"- **{c['town']}**: {reason}")

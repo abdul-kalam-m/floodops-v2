@@ -45,9 +45,18 @@ UTM18N = 26918  # analysis CRS (meters) -- same choice as v1, for consistency
 # --- hazard source (locked, §3.1/§13.3) --------------------------------------
 CIE_BASE = ("https://services1.arcgis.com/ze0XBzU1FXj94DJq/arcgis/rest/services/"
             "RU_NJ_CIE_Full/FeatureServer")
-LEVELS_FT = list(range(1, 21))  # whole-foot only, 1-20 ft above MHHW (locked, §2.1)
+LEVELS_FT = list(range(0, 21))  # whole-foot, 0-20 ft above MHHW (locked, §2.1; 0 ft
+                                 # -- the MHHW baseline itself -- added 2026-08-01,
+                                 # owner-approved, reversing the original exclusion)
 WHOLE_FOOT_NAME_RE = re.compile(
-    r"^Rutgers NJ (\d+) ft\. Coastal Inundation Extent(, Low-Lying Areas)?\s*$"
+    r"^Rutgers NJ (\d+) ft\. Coastal Inundation Extent"
+    r"(?: \(Mean Higher High Water\))?(, Low-Lying Areas)?\s*$"
+    # The 0 ft layer (ids 82/83) is the only one with the "(Mean Higher High Water)"
+    # suffix -- verified against all 84 layer names live, 2026-08-01, not just the
+    # 0 ft pair, before adding this: no other level has a parenthetical suffix, so
+    # this can't accidentally swallow anything else. Half-foot layers ("N ft., 6 in.")
+    # still don't match -- there's a comma+inches between "ft." and "Coastal" there,
+    # which this pattern still requires to be a single space.
 )
 
 UA = "floodops-v2/1.0 (portfolio project; ar.abdulkalam.mustaq@gmail.com)"

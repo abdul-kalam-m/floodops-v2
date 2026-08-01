@@ -137,8 +137,15 @@ def build_one_town(slug: str, town: str, mun: str, force: bool) -> dict:
 
         # --- roads (2-tier) ---
         closed_mask = roads_utm.geometry.intersects(extent_tolerant)
-        closed_ids = set(roads_utm.loc[closed_mask, "id"])
-        roads_sparse = {rid: {"status": "closed"} for rid in closed_ids}
+        # Iterate the DataFrame-ordered list (deterministic, matches roads.geojson's own
+        # feature order), not a bare `set` -- Python randomizes string-hash iteration
+        # order per process, so serializing straight from a set of road ids made every
+        # exposure_*.json's road key order (not content) change on every pipeline
+        # re-run, a diff-noise bug found 2026-08-01 while adding the 0 ft level. `closed_ids`
+        # stays a set for the O(1) membership check below.
+        closed_ids_ordered = list(roads_utm.loc[closed_mask, "id"])
+        closed_ids = set(closed_ids_ordered)
+        roads_sparse = {rid: {"status": "closed"} for rid in closed_ids_ordered}
 
         # --- assets (3-tier) ---
         exposed_mask = assets_utm.geometry.within(extent_tolerant)

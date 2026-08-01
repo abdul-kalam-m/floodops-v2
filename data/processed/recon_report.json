@@ -1,7 +1,8 @@
 {
-  "generated_utc": "2026-07-31T18:38:11.069665+00:00",
+  "generated_utc": "2026-08-01T03:50:10.534157+00:00",
   "hazard_source": "https://services1.arcgis.com/ze0XBzU1FXj94DJq/arcgis/rest/services/RU_NJ_CIE_Full/FeatureServer",
   "levels_ft_in_scope": [
+    0,
     1,
     2,
     3,
@@ -33,6 +34,7 @@
       "note": "Anchor: airport, port, rail hub; confirmed full coverage",
       "passes": true,
       "levels_covered": [
+        0,
         1,
         2,
         3,
@@ -68,6 +70,7 @@
       "note": "Dense waterfront, famous Sandy flood history, small/compact",
       "passes": true,
       "levels_covered": [
+        0,
         1,
         2,
         3,
@@ -103,6 +106,7 @@
       "note": "Large waterfront city, PATH, Hudson + Newark Bay frontage",
       "passes": true,
       "levels_covered": [
+        0,
         1,
         2,
         3,
@@ -138,6 +142,7 @@
       "note": "Open-ocean-facing -- different flood geometry",
       "passes": true,
       "levels_covered": [
+        0,
         1,
         2,
         3,
@@ -173,6 +178,7 @@
       "note": "Raritan tidal limit; narrative link to FloodOps v1",
       "passes": true,
       "levels_covered": [
+        0,
         1,
         2,
         3,
@@ -208,6 +214,7 @@
       "note": "Raritan Bay confluence, historic coastal flooding",
       "passes": true,
       "levels_covered": [
+        0,
         1,
         2,
         3,
@@ -243,6 +250,7 @@
       "note": "Delaware River waterfront -- different watershed, geographic diversity",
       "passes": true,
       "levels_covered": [
+        0,
         1,
         2,
         3,
@@ -278,6 +286,7 @@
       "note": "Kill Van Kull/Newark Bay, industrial critical infrastructure",
       "passes": true,
       "levels_covered": [
+        0,
         1,
         2,
         3,
