@@ -30,6 +30,14 @@ export const ROAD_STATUS_LABEL: Record<RoadStatus, string> = {
 // a V2 screenshot must never be mistakable for a v1 depth map, §8 of the guide).
 export const EXPOSURE_FILL_COLOR = "#2563a3";
 
+// Municipal boundary line. Deliberately violet -- the only hue family not already used
+// by ASSET_COLORS/ROAD_COLORS/EXPOSURE_FILL_COLOR above, so the dashed boundary can
+// never read as "just another gray road" against the basemap (owner-reported issue,
+// 2026-07-31: the original #334155 slate sat too close to ROAD_COLORS.open/basemap
+// road casing). Single source of truth -- MapView's map layer and Legend's swatch
+// both import this rather than hardcoding the color twice.
+export const BOUNDARY_COLOR = "#7c3aed";
+
 // Single-letter marker glyph per category (encodes category without color alone).
 export const CATEGORY_LETTER: Record<string, string> = {
   fire: "F",

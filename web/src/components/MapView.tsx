@@ -1,7 +1,9 @@
 import { useEffect, useRef } from "react";
 import maplibregl, { type StyleSpecification } from "maplibre-gl";
 import type { ExposureJson, FirstExposedMap, GeoJson } from "../types";
-import { ASSET_COLORS, ASSET_STATUS_LABEL, EXPOSURE_FILL_COLOR, ROAD_COLORS } from "../lib/palette";
+import {
+  ASSET_COLORS, ASSET_STATUS_LABEL, BOUNDARY_COLOR, EXPOSURE_FILL_COLOR, ROAD_COLORS,
+} from "../lib/palette";
 
 // Resilient raster basemap (Carto Positron), same choice as v1. Each tile is
 // independent, so the app stays usable if the basemap is unreachable (§8.6).
@@ -116,7 +118,7 @@ export default function MapView(props: Props) {
         type: "line",
         source: "boundary",
         paint: {
-          "line-color": "#334155", "line-width": 2, "line-dasharray": [3, 2], "line-opacity": 0.8,
+          "line-color": BOUNDARY_COLOR, "line-width": 2, "line-dasharray": [3, 2], "line-opacity": 0.8,
         },
       });
 

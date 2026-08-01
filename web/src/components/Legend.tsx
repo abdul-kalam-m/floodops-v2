@@ -1,4 +1,6 @@
-import { ASSET_COLORS, ASSET_STATUS_LABEL, EXPOSURE_FILL_COLOR, ROAD_COLORS, ROAD_STATUS_LABEL } from "../lib/palette";
+import {
+  ASSET_COLORS, ASSET_STATUS_LABEL, BOUNDARY_COLOR, EXPOSURE_FILL_COLOR, ROAD_COLORS, ROAD_STATUS_LABEL,
+} from "../lib/palette";
 import type { AssetStatus, RoadStatus } from "../types";
 
 const ASSET_ORDER: AssetStatus[] = ["operational", "isolated", "exposed"];
@@ -47,7 +49,7 @@ export default function Legend() {
 
       <div className="flex items-center gap-1.5">
         <svg width="14" height="2" className="shrink-0" aria-hidden="true">
-          <line x1="0" y1="1" x2="14" y2="1" stroke="#334155" strokeWidth="2" strokeDasharray="3,2" />
+          <line x1="0" y1="1" x2="14" y2="1" stroke={BOUNDARY_COLOR} strokeWidth="2" strokeDasharray="3,2" />
         </svg>
         <span className="text-gray-600">Municipal boundary</span>
       </div>
