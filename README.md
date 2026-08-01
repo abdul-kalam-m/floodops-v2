@@ -15,4 +15,4 @@ Multi-municipality coastal flood **exposure** dashboard for New Jersey's tidal/c
 
 ## Status
 
-Phase 0 (bootstrap + recon). See `PROGRESS.md`.
+Phases 0–5 complete for all 8 locked towns (Newark, Hoboken, Jersey City, Atlantic City, New Brunswick, Perth Amboy, Camden, Bayonne): pipeline, exposure engine, dashboard, simulator UX, and reports (`/report`, `/methods`) are built and verified. Pending: Cloudflare Pages deployment and a live-browser smoke test of the MapLibre dashboard (see `PROGRESS.md`'s latest entry for why that check is still outstanding). See `PROGRESS.md` for full phase-by-phase detail.
