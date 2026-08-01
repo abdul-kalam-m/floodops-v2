@@ -82,8 +82,18 @@ def address(tags: dict) -> str:
 
 
 def fetch_one_town(slug: str, town: str, force: bool) -> dict:
+    # study_area (1 km buffer) only sizes the Overpass query envelope now -- generous
+    # on purpose, so a real feature right at the municipal edge isn't dropped by too
+    # tight a bbox. The actual keep/drop decision below uses the municipal boundary
+    # itself, not the buffer (owner decision, 2026-08-01): the flood layer's own extent
+    # never exceeds the boundary either (it's an independent MUN-attribute filter, not
+    # spatially clipped to anything in this repo -- see 04_fetch_hazard.py), so an
+    # asset sitting in the buffer zone would always read as "not flooded" even at the
+    # 20 ft scenario -- indistinguishable from a genuine no-flood finding when it's
+    # really just outside where the hazard data exists at all. Keeping the map's
+    # assets/roads on the same footing as the flood layer removes that ambiguity.
     study = gpd.read_file(fl.PROCESSED / slug / "study_area.geojson")
-    study_geom = study.union_all()
+    boundary_geom = gpd.read_file(fl.PROCESSED / slug / "boundary.geojson").union_all()
     s, w, n, e = study.total_bounds[1], study.total_bounds[0], study.total_bounds[3], study.total_bounds[2]
     bbox = f"{s},{w},{n},{e}"
 
@@ -106,7 +116,7 @@ def fetch_one_town(slug: str, town: str, force: bool) -> dict:
         if lon is None or lat is None:
             continue
         pt = Point(lon, lat)
-        if not study_geom.contains(pt):
+        if not boundary_geom.contains(pt):
             continue
         rows.append({
             "osm_id": f"{el['type'][0]}{el['id']}",
@@ -117,7 +127,7 @@ def fetch_one_town(slug: str, town: str, force: bool) -> dict:
         })
 
     if not rows:
-        raise RuntimeError(f"{town}: no assets found in study area.")
+        raise RuntimeError(f"{town}: no assets found inside the municipal boundary.")
 
     gdf = gpd.GeoDataFrame(rows, crs=fl.WGS84)
 

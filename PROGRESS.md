@@ -4,6 +4,56 @@ Newest entry on top. Never delete entries. Format per OPERATING_GUIDE.md §13.5 
 
 ---
 
+## 2026-08-01 — Clip assets/roads to municipal boundary, not the 1 km buffer (owner request, agent: sonnet-5)
+
+**Owner's reasoning (correct, and a real honesty issue, not just a cosmetic one):** the flood
+layer's own extent never exceeds the municipal boundary (it's an independent `MUN`-attribute
+filter on Rutgers' service, not spatially clipped to anything in this repo). Assets/roads,
+though, were being kept out to a 1 km buffer beyond that same boundary. A road or facility
+sitting in that buffer zone would always show "not flooded," even at the 20 ft scenario —
+visually indistinguishable from a genuine no-flood finding, when it's really just outside
+where hazard data exists at all. Fixed by changing the final keep/drop check.
+
+**Changed:**
+- `02_fetch_assets.py`: the point-containment filter now uses `boundary.geojson`
+  (`boundary_geom.contains(pt)`) instead of `study_area.geojson`. The 1 km buffer is kept
+  *only* to size the Overpass query bbox (generous on purpose, so a real edge feature isn't
+  dropped by too tight a box) — it no longer decides what's kept.
+- `03_fetch_roads.py`: same change, `line_utm.intersection(boundary_utm)` instead of
+  `study_utm`. Roads that cross the boundary are now trimmed exactly at the line, same as
+  the flood layer's own edge behavior.
+- Re-ran `02` → `03` → `05_build_exposure.py` → `09_validate.py` for all 8 towns. Overpass
+  responses were already cached (same bbox, same categories — only the local filter logic
+  changed), so re-fetching was fast. **1554/1554 validator checks pass**, 15/15 pytest.
+- **Verified the clip rigorously, not just by inspection:** ran a true polygon-containment
+  check (`geometry.within(boundary.buffer(tiny_epsilon))`, not a bounding-box proxy) across
+  every road and asset in all 8 towns. **0 features outside the boundary anywhere** (7,020
+  Newark road segments, 177 Newark assets, down to Hoboken's 521/33 — all towns, zero
+  exceptions).
+- Counts dropped meaningfully for compact towns where the 1 km buffer was proportionally
+  large relative to the town itself: Newark 263→177 assets (11,142→7,020 road segments,
+  continuing the trend from the earlier road-ordering fix's count), Hoboken 61→33 assets
+  (521 segments, notably **0 km of priority-class road** inside Hoboken's strict boundary —
+  its motorway/trunk/primary roads apparently all sit just outside the town line). Gzip
+  budgets dropped too (Newark: 990.9 → 861.4 KB total), still comfortably under the 5 MB cap.
+- **Notable finding, worth keeping for the eventual case study:** with the buffer gone,
+  Hoboken (33/33) and Atlantic City (46/46) both now show **100% of their remaining assets**
+  eventually exposed by the 20 ft scenario — every single facility inside the strict boundary
+  becomes non-operational at some level. New Brunswick stays at 0/38 (upstream tidal-limit
+  town, consistent with before — removing far-away buffer assets can only hold or shrink an
+  already-zero count, never grow it).
+- `OPERATING_GUIDE.md` updated (new paragraph after the §6.1 script list documenting the
+  locked clip-target decision) and re-synced to the canonical portfolio copy.
+- Web app rebuilt: `tsc`/`eslint` clean, JS bundle unchanged (276.58 KB gzip, data-only
+  change). Spot-verified live: Newark's `/report?level=20` shows 32 affected facilities out
+  of 177 total (unchanged from the pre-clip 32-exposed count — the removed buffer-zone
+  assets were apparently all outside the flood-prone fringe anyway, so only the
+  "operational" denominator shrank, not the exposed numerator).
+
+**⚠ Deviations / open items:** none new.
+
+---
+
 ## 2026-08-01 — Add 0 ft (MHHW baseline) level (owner request, agent: sonnet-5)
 
 **Owner request:** add a 0 ft scenario. This reverses the 2026-07-22 exclusion of the

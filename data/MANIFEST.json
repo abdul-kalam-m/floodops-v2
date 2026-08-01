@@ -66,134 +66,6 @@
       "license_note": "US Census TIGERweb, public domain"
     },
     {
-      "name": "osm_assets_newark",
-      "source_url": "https://overpass-api.de/api/interpreter (assets query, Newark)",
-      "retrieved_utc": "2026-07-31T19:09:18.182857+00:00",
-      "sha256": "4ff8d652e02ef9a41e0fcb5a57d865379011783a6ac96d8d891d1075b72cbd9f",
-      "local_path": "data\\processed\\newark\\assets.geojson",
-      "license_note": "OpenStreetMap contributors, ODbL"
-    },
-    {
-      "name": "osm_assets_hoboken",
-      "source_url": "https://overpass-api.de/api/interpreter (assets query, Hoboken)",
-      "retrieved_utc": "2026-07-31T19:10:24.267908+00:00",
-      "sha256": "f5c3ebf1d2395b47f64566c3a016019ad52427580a7e47f7ac4e07c2f003be19",
-      "local_path": "data\\processed\\hoboken\\assets.geojson",
-      "license_note": "OpenStreetMap contributors, ODbL"
-    },
-    {
-      "name": "osm_assets_jersey-city",
-      "source_url": "https://overpass-api.de/api/interpreter (assets query, Jersey City)",
-      "retrieved_utc": "2026-07-31T19:13:26.459511+00:00",
-      "sha256": "73ad73afb5edbe39ea7f6bb6cf7dd51149189ce6e3120c57c794190cb458b81a",
-      "local_path": "data\\processed\\jersey-city\\assets.geojson",
-      "license_note": "OpenStreetMap contributors, ODbL"
-    },
-    {
-      "name": "osm_assets_atlantic-city",
-      "source_url": "https://overpass-api.de/api/interpreter (assets query, Atlantic City)",
-      "retrieved_utc": "2026-07-31T19:14:40.617366+00:00",
-      "sha256": "e7fadfa49b7bea676cc6c1beaaeb986f8683569257b0b8c3e44d1d0046b93273",
-      "local_path": "data\\processed\\atlantic-city\\assets.geojson",
-      "license_note": "OpenStreetMap contributors, ODbL"
-    },
-    {
-      "name": "osm_assets_new-brunswick",
-      "source_url": "https://overpass-api.de/api/interpreter (assets query, New Brunswick)",
-      "retrieved_utc": "2026-07-31T19:15:53.737991+00:00",
-      "sha256": "7ceca5c6e485793548155b075074d4f1b6ca73fec8bba1ee022e38d58e47527a",
-      "local_path": "data\\processed\\new-brunswick\\assets.geojson",
-      "license_note": "OpenStreetMap contributors, ODbL"
-    },
-    {
-      "name": "osm_assets_perth-amboy",
-      "source_url": "https://overpass-api.de/api/interpreter (assets query, Perth Amboy)",
-      "retrieved_utc": "2026-07-31T19:16:32.037305+00:00",
-      "sha256": "54ab6426cbd6d925948c56fc9a76abf53e1bccf7a9037212797bddfd4f7fd7d1",
-      "local_path": "data\\processed\\perth-amboy\\assets.geojson",
-      "license_note": "OpenStreetMap contributors, ODbL"
-    },
-    {
-      "name": "osm_assets_camden",
-      "source_url": "https://overpass-api.de/api/interpreter (assets query, Camden)",
-      "retrieved_utc": "2026-07-31T19:19:08.803838+00:00",
-      "sha256": "8f8b7d66c95d69592319b2aa3b9886e66aa4e45ed9c74578679ddd31f5c9a3a8",
-      "local_path": "data\\processed\\camden\\assets.geojson",
-      "license_note": "OpenStreetMap contributors, ODbL"
-    },
-    {
-      "name": "osm_assets_bayonne",
-      "source_url": "https://overpass-api.de/api/interpreter (assets query, Bayonne)",
-      "retrieved_utc": "2026-07-31T19:21:49.144116+00:00",
-      "sha256": "268fb4283aa1e0ad4548eca7ccd8f59e923ac8e787aec2bd5bb36b7cd3336196",
-      "local_path": "data\\processed\\bayonne\\assets.geojson",
-      "license_note": "OpenStreetMap contributors, ODbL"
-    },
-    {
-      "name": "osm_roads_newark",
-      "source_url": "https://overpass-api.de/api/interpreter (roads query, Newark)",
-      "retrieved_utc": "2026-07-31T21:57:55.394088+00:00",
-      "sha256": "1cc6116173b8021bfd24e2780f7ae78679ba15df2e826db70e6c8004fccbf29f",
-      "local_path": "data\\processed\\newark\\roads.geojson",
-      "license_note": "OpenStreetMap contributors, ODbL"
-    },
-    {
-      "name": "osm_roads_hoboken",
-      "source_url": "https://overpass-api.de/api/interpreter (roads query, Hoboken)",
-      "retrieved_utc": "2026-07-31T21:57:56.071497+00:00",
-      "sha256": "0531a7cd24f89a63e9eae8f20620a089f7dfe4ecc39561f79c48033994708d03",
-      "local_path": "data\\processed\\hoboken\\roads.geojson",
-      "license_note": "OpenStreetMap contributors, ODbL"
-    },
-    {
-      "name": "osm_roads_jersey-city",
-      "source_url": "https://overpass-api.de/api/interpreter (roads query, Jersey City)",
-      "retrieved_utc": "2026-07-31T21:57:58.798623+00:00",
-      "sha256": "a5d5404854ebb8fa94708d4ab4f28b2ee72d73bf8a793a3ec52d4be12919208d",
-      "local_path": "data\\processed\\jersey-city\\roads.geojson",
-      "license_note": "OpenStreetMap contributors, ODbL"
-    },
-    {
-      "name": "osm_roads_atlantic-city",
-      "source_url": "https://overpass-api.de/api/interpreter (roads query, Atlantic City)",
-      "retrieved_utc": "2026-07-31T21:57:59.591292+00:00",
-      "sha256": "b414659de326749c3acb7927da31d8428e937cba413b9a467cab87ed87149473",
-      "local_path": "data\\processed\\atlantic-city\\roads.geojson",
-      "license_note": "OpenStreetMap contributors, ODbL"
-    },
-    {
-      "name": "osm_roads_new-brunswick",
-      "source_url": "https://overpass-api.de/api/interpreter (roads query, New Brunswick)",
-      "retrieved_utc": "2026-07-31T21:58:01.181237+00:00",
-      "sha256": "70d0515c0e2bf263eeb4e0a0f076c76dd64c934b0cf46f24454bbebdc4515c52",
-      "local_path": "data\\processed\\new-brunswick\\roads.geojson",
-      "license_note": "OpenStreetMap contributors, ODbL"
-    },
-    {
-      "name": "osm_roads_perth-amboy",
-      "source_url": "https://overpass-api.de/api/interpreter (roads query, Perth Amboy)",
-      "retrieved_utc": "2026-07-31T21:58:02.054673+00:00",
-      "sha256": "ca50ead598b93eac6dd6c3a51a5bbc124cf8b30e1a0b71593a214e8084ea4588",
-      "local_path": "data\\processed\\perth-amboy\\roads.geojson",
-      "license_note": "OpenStreetMap contributors, ODbL"
-    },
-    {
-      "name": "osm_roads_camden",
-      "source_url": "https://overpass-api.de/api/interpreter (roads query, Camden)",
-      "retrieved_utc": "2026-07-31T21:58:03.834952+00:00",
-      "sha256": "8cc10d974fe613a0611ef69865f63df97cc9842207550c0eb09cac0e8c15eb55",
-      "local_path": "data\\processed\\camden\\roads.geojson",
-      "license_note": "OpenStreetMap contributors, ODbL"
-    },
-    {
-      "name": "osm_roads_bayonne",
-      "source_url": "https://overpass-api.de/api/interpreter (roads query, Bayonne)",
-      "retrieved_utc": "2026-07-31T21:58:04.491284+00:00",
-      "sha256": "dbc8fa8398763ef1dfd397f05211085706b8f812cde61c62255572e135b15403",
-      "local_path": "data\\processed\\bayonne\\roads.geojson",
-      "license_note": "OpenStreetMap contributors, ODbL"
-    },
-    {
       "name": "cie_service_metadata",
       "source_url": "https://services1.arcgis.com/ze0XBzU1FXj94DJq/arcgis/rest/services/RU_NJ_CIE_Full/FeatureServer",
       "retrieved_utc": "2026-08-01T03:50:10.532155+00:00",
@@ -2048,6 +1920,134 @@
       "level_ft": 20,
       "main_layer": 2,
       "low_lying_layer": 3
+    },
+    {
+      "name": "osm_assets_newark",
+      "source_url": "https://overpass-api.de/api/interpreter (assets query, Newark)",
+      "retrieved_utc": "2026-08-01T09:42:07.883636+00:00",
+      "sha256": "607f709fd55cb8cf0a460676a18de856871972e4eb3dd7922deedb3bd650dea5",
+      "local_path": "data\\processed\\newark\\assets.geojson",
+      "license_note": "OpenStreetMap contributors, ODbL"
+    },
+    {
+      "name": "osm_assets_hoboken",
+      "source_url": "https://overpass-api.de/api/interpreter (assets query, Hoboken)",
+      "retrieved_utc": "2026-08-01T09:42:08.360336+00:00",
+      "sha256": "7523af1f8202264012bc5d4a60d40f378131a525b667db60c25c2610e224fc8d",
+      "local_path": "data\\processed\\hoboken\\assets.geojson",
+      "license_note": "OpenStreetMap contributors, ODbL"
+    },
+    {
+      "name": "osm_assets_jersey-city",
+      "source_url": "https://overpass-api.de/api/interpreter (assets query, Jersey City)",
+      "retrieved_utc": "2026-08-01T09:42:09.164450+00:00",
+      "sha256": "4453ef41a77792effb2e1e22995f0c800a3ab26257bb4a001c4ea0e0443adf32",
+      "local_path": "data\\processed\\jersey-city\\assets.geojson",
+      "license_note": "OpenStreetMap contributors, ODbL"
+    },
+    {
+      "name": "osm_assets_atlantic-city",
+      "source_url": "https://overpass-api.de/api/interpreter (assets query, Atlantic City)",
+      "retrieved_utc": "2026-08-01T09:42:09.219056+00:00",
+      "sha256": "a4f7ae843a39b5f559d2bcb034bdf4a566ddeb10c983925e578c1bc119a6ac14",
+      "local_path": "data\\processed\\atlantic-city\\assets.geojson",
+      "license_note": "OpenStreetMap contributors, ODbL"
+    },
+    {
+      "name": "osm_assets_new-brunswick",
+      "source_url": "https://overpass-api.de/api/interpreter (assets query, New Brunswick)",
+      "retrieved_utc": "2026-08-01T09:42:09.269531+00:00",
+      "sha256": "c054ec09ec4410c193e6be4f245511cb7589156b3eb109bf370d76539ff154fc",
+      "local_path": "data\\processed\\new-brunswick\\assets.geojson",
+      "license_note": "OpenStreetMap contributors, ODbL"
+    },
+    {
+      "name": "osm_assets_perth-amboy",
+      "source_url": "https://overpass-api.de/api/interpreter (assets query, Perth Amboy)",
+      "retrieved_utc": "2026-08-01T09:42:09.316315+00:00",
+      "sha256": "f4ce4c0e6d6f6234e208e27aa08c4acc9560258599c58838638729b4f949a330",
+      "local_path": "data\\processed\\perth-amboy\\assets.geojson",
+      "license_note": "OpenStreetMap contributors, ODbL"
+    },
+    {
+      "name": "osm_assets_camden",
+      "source_url": "https://overpass-api.de/api/interpreter (assets query, Camden)",
+      "retrieved_utc": "2026-08-01T09:42:10.063436+00:00",
+      "sha256": "f5ec5d999222a74271d897b6f9aa8ae5591aeb737cc1ef7589a174f915b91b28",
+      "local_path": "data\\processed\\camden\\assets.geojson",
+      "license_note": "OpenStreetMap contributors, ODbL"
+    },
+    {
+      "name": "osm_assets_bayonne",
+      "source_url": "https://overpass-api.de/api/interpreter (assets query, Bayonne)",
+      "retrieved_utc": "2026-08-01T09:42:10.107779+00:00",
+      "sha256": "4516fdb71ae8546f59de5f144e6ed706fc7b1f8f78cefe3f24d9197fbc697b95",
+      "local_path": "data\\processed\\bayonne\\assets.geojson",
+      "license_note": "OpenStreetMap contributors, ODbL"
+    },
+    {
+      "name": "osm_roads_newark",
+      "source_url": "https://overpass-api.de/api/interpreter (roads query, Newark)",
+      "retrieved_utc": "2026-08-01T09:42:43.177392+00:00",
+      "sha256": "2c03a8ad1c1395c616b94efd61c5d3fe5baa9a6a3fd8b4f3c4125d523b1e8e0b",
+      "local_path": "data\\processed\\newark\\roads.geojson",
+      "license_note": "OpenStreetMap contributors, ODbL"
+    },
+    {
+      "name": "osm_roads_hoboken",
+      "source_url": "https://overpass-api.de/api/interpreter (roads query, Hoboken)",
+      "retrieved_utc": "2026-08-01T09:42:43.490932+00:00",
+      "sha256": "3f4dc11c2acc19fb2cd7e543fa34c5fb4f060b052d6491c6670c30589c5e1106",
+      "local_path": "data\\processed\\hoboken\\roads.geojson",
+      "license_note": "OpenStreetMap contributors, ODbL"
+    },
+    {
+      "name": "osm_roads_jersey-city",
+      "source_url": "https://overpass-api.de/api/interpreter (roads query, Jersey City)",
+      "retrieved_utc": "2026-08-01T09:42:44.952800+00:00",
+      "sha256": "5495e10c9929178c274e390b91377325a583352d06a74662067aa4bcbb244662",
+      "local_path": "data\\processed\\jersey-city\\roads.geojson",
+      "license_note": "OpenStreetMap contributors, ODbL"
+    },
+    {
+      "name": "osm_roads_atlantic-city",
+      "source_url": "https://overpass-api.de/api/interpreter (roads query, Atlantic City)",
+      "retrieved_utc": "2026-08-01T09:42:45.624959+00:00",
+      "sha256": "9f44c69a0504127ac4332e29bd96f9adef867f562fc564f42bbfb8d6db7ceec9",
+      "local_path": "data\\processed\\atlantic-city\\roads.geojson",
+      "license_note": "OpenStreetMap contributors, ODbL"
+    },
+    {
+      "name": "osm_roads_new-brunswick",
+      "source_url": "https://overpass-api.de/api/interpreter (roads query, New Brunswick)",
+      "retrieved_utc": "2026-08-01T09:42:46.643443+00:00",
+      "sha256": "bfa880d3fa59dec43b59f96777409dadcd868345216029cdcb6c3a627ce4b79f",
+      "local_path": "data\\processed\\new-brunswick\\roads.geojson",
+      "license_note": "OpenStreetMap contributors, ODbL"
+    },
+    {
+      "name": "osm_roads_perth-amboy",
+      "source_url": "https://overpass-api.de/api/interpreter (roads query, Perth Amboy)",
+      "retrieved_utc": "2026-08-01T09:42:47.061642+00:00",
+      "sha256": "edbb6c8da2169fb966bab737ab550423887e179cf44f6dc887d9eb93f949b952",
+      "local_path": "data\\processed\\perth-amboy\\roads.geojson",
+      "license_note": "OpenStreetMap contributors, ODbL"
+    },
+    {
+      "name": "osm_roads_camden",
+      "source_url": "https://overpass-api.de/api/interpreter (roads query, Camden)",
+      "retrieved_utc": "2026-08-01T09:42:47.972309+00:00",
+      "sha256": "e80f1e6fd3fc3aa9c8809a8953fbafb6ba2df6e83676f87544ae02c10ba9fbcd",
+      "local_path": "data\\processed\\camden\\roads.geojson",
+      "license_note": "OpenStreetMap contributors, ODbL"
+    },
+    {
+      "name": "osm_roads_bayonne",
+      "source_url": "https://overpass-api.de/api/interpreter (roads query, Bayonne)",
+      "retrieved_utc": "2026-08-01T09:42:48.450400+00:00",
+      "sha256": "d2d6f4639075c1a2fa2e0396a63186c0fd1ccf6de2b57d5034800351a0b5de4e",
+      "local_path": "data\\processed\\bayonne\\roads.geojson",
+      "license_note": "OpenStreetMap contributors, ODbL"
     }
   ]
 }

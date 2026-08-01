@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""03 — Fetch the drivable road network per town, clip to study area, segment to <=200 m.
+"""03 — Fetch the drivable road network per town, clip to municipal boundary, segment
+to <=200 m.
 
 Reuses v1's OSM/Overpass road-fetch and segmentation logic (§6.1) verbatim, looped
-per town in floodops_v2_lib.TOWN_REGISTRY.
+per town in floodops_v2_lib.TOWN_REGISTRY. Clip target changed 2026-08-01 from the 1 km
+study_area buffer to the strict municipal boundary (owner decision) -- see the comment
+in fetch_one_town for why.
 
 Outputs per town: data/processed/{slug}/roads.geojson (EPSG:4326).
 Schema: {id, name, class, is_priority} (+ length_m) -- same as v1.
@@ -64,8 +67,17 @@ def line_parts(geom):
 
 
 def fetch_one_town(slug: str, town: str, force: bool) -> dict:
+    # study_area (1 km buffer) only sizes the Overpass query envelope now -- generous
+    # on purpose, so a real road right at the municipal edge isn't dropped by too tight
+    # a bbox. The actual clip below uses the municipal boundary itself (owner decision,
+    # 2026-08-01): the flood layer's own extent never exceeds the boundary either (an
+    # independent MUN-attribute filter on Rutgers' service, not spatially clipped to
+    # anything in this repo -- see 04_fetch_hazard.py), so a road segment left sitting
+    # in the buffer zone would always render as "not flooded" even at the 20 ft
+    # scenario -- indistinguishable from a genuine no-flood finding when it's really
+    # just outside where the hazard data exists at all.
     study = gpd.read_file(fl.PROCESSED / slug / "study_area.geojson")
-    study_utm = shp_transform(_to_utm, study.union_all())
+    boundary_utm = shp_transform(_to_utm, gpd.read_file(fl.PROCESSED / slug / "boundary.geojson").union_all())
     s, w, n, e = study.total_bounds[1], study.total_bounds[0], study.total_bounds[3], study.total_bounds[2]
     bbox = f"{s},{w},{n},{e}"
 
@@ -84,7 +96,7 @@ def fetch_one_town(slug: str, town: str, force: bool) -> dict:
         name = way.get("tags", {}).get("name", "")
         line_wgs = LineString([(p["lon"], p["lat"]) for p in geom])
         line_utm = shp_transform(_to_utm, line_wgs)
-        clipped = line_utm.intersection(study_utm)
+        clipped = line_utm.intersection(boundary_utm)
         for part in line_parts(clipped):
             for seg in split_line(part):
                 # Some OSM ways have two adjacent nodes at (near-)identical coordinates
