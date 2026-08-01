@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #111827;
+}
+
+/* MapLibre attribution readability on the light basemap */
+.maplibregl-ctrl-attrib {
+  font-size: 10px;
+}
+
+/* Print / "Save as PDF" output for /report and /methods (§9.2-equivalent: A4/Letter
+   clean, no map, page numbers, black-on-white). Page numbers via @page margin boxes are
+   Chromium-only; ReportPage also prompts the browser's own print-dialog "headers and
+   footers" option as a universal fallback. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  html,
+  body {
+    background: #fff;
+  }
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
+}
+
+@page {
+  margin: 16mm 14mm;
+  @bottom-center {
+    content: "Page " counter(page) " of " counter(pages);
+    font-size: 9px;
+    color: #6b7280;
+  }
+}

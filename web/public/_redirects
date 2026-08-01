@@ -1,0 +1,5 @@
+# SPA fallback for Cloudflare Pages. /report and /methods are real client-rendered
+# routes (main.tsx picks the page by pathname, no router library) — without this,
+# navigating directly to them (a shared link, a QR code, or a page refresh) 404s,
+# since Pages otherwise only serves files that exist on disk.
+/*  /index.html  200

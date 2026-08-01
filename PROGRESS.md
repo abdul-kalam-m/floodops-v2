@@ -4,6 +4,93 @@ Newest entry on top. Never delete entries. Format per OPERATING_GUIDE.md §13.5 
 
 ---
 
+## 2026-07-31 — Phases 3-5: Dashboard, simulator UX, reports (agent: sonnet-5)
+
+**Done:**
+- **Phase 3 (shell):** `TownPicker` (dropdown sourced from `towns.json`), `LevelSlider`
+  (adapted from v1's `StageSlider` — sparse tick labels since up to 20 levels, no NWS
+  category vocabulary, footer shows the hazard source), `MapView` (MapLibre GL, sources for
+  exposure fill / boundary / roads / assets, single-color exposure fill per §8 — distinct
+  from v1's 4-class depth ramp so a V2 screenshot is never mistaken for a depth map), `App`
+  shell with hash routing (`#town=<slug>&level=<ft>`), town-switch and level-change effects,
+  neighbor-level prefetching (`prefetchNeighborLevels`).
+- **Phase 4 (simulator UX):** `SummaryCards` (3-tier facility counts + road-closure count/
+  miles), `AssetTable` (sortable/filterable, no depth column — `STATUS_RANK` ordered
+  exposed/isolated/operational), `Legend` (3-tier facility + 2-tier road + single exposure
+  swatch), `LayerToggle`, asset popup + selection wired into `MapView`.
+- **Phase 5 (reports):** `lib/csv.ts` (`buildExposedAssetsCsv` — V2 field list, no
+  `depth_ft`/`category_label`, adds `town`/`hazard_source`; RFC-4180 escaping),
+  `ReportButtons` (CSV download + `/report` link), `pages/ReportPage.tsx` (header, 3-tier
+  summary, closed-priority-roads line, affected-facilities table sorted by
+  first-exposed-level, **prepositioning watchlist at "next 1 ft of rise"** — an exact fit
+  since levels are 1 ft apart, unlike v1's uneven NWS-category gaps), `pages/MethodsPage.tsx`
+  (hazard source, **MHHW-vs-NAVD88 explanation**, what the model does *not* compute, 3-tier/
+  2-tier status tables, access-loss rule, coverage note linking to v1 for a riverine
+  example), `main.tsx` pathname routing (`/report`, `/methods`, else `App` — same
+  no-router-library pattern as v1), `web/public/_redirects` (Cloudflare SPA fallback, same
+  as v1).
+
+**Verification:**
+- `tsc --noEmit`: 0 errors. `eslint .`: 0 errors, 1 warning (`main.tsx` fast-refresh-only-
+  works-with-exports on the inline `Root` component) — confirmed this is **not** a
+  regression by running the same lint against v1's `main.tsx`, which has the identical
+  warning from the identical pattern.
+- `npm run build`: succeeds. JS bundle 276.5 KB gzip (v1's locked budget: ≤400 KB gzip,
+  §8.7 — comfortable margin). Vite's generic >500 KB *raw*-chunk warning fires (988 KB raw)
+  but raw size is not the governing metric per this project's own gzip-budget correction
+  (Phase 2 finding) — not treated as a failure.
+- **Real-data browser verification (`/report`, `/methods`, both fully static, no
+  MapLibre):** loaded against the production build on Newark. `/report?town=newark`
+  (defaults to level 20): 31 exposed + 1 isolated = 32-row table, monotonically sorted by
+  first-exposed level (4→20), 24 closed priority roads listed, disclaimer present verbatim.
+  Cross-checked `/report?town=newark&level=10` independently: 21 exposed + 0 isolated —
+  matches counting first-exposed ≤ 10 from the level-20 table exactly (21 rows with
+  `first_exposed ≤ 10`, and the one isolated facility's `first_exposed=18` correctly
+  excluded). `/methods` rendered all sections with the real MHHW/NAVD88/tier-definition
+  copy. Zero console errors on either page. CSV-download button click produced no errors
+  (button/handler wiring confirmed; the resulting file's on-disk content was not opened and
+  diff-checked byte-for-byte, since `buildExposedAssetsCsv` is a direct filter/map over the
+  same already-verified `exposure`/`firstExposed` data with no new computation).
+
+**⚠ Deviations / open items:**
+- **The main dashboard (`App`/`MapView`, MapLibre-based) could not be visually/pixel
+  verified in this session's Browser-pane environment.** Root cause (extensively
+  diagnosed): the Browser pane's `requestAnimationFrame` is suspended whenever the pane
+  isn't visually composited by the client, which stalls MapLibre's internal render loop
+  (and therefore its `"load"` event) indefinitely; confirmed via explicit tool errors
+  ("the Browser pane is currently hidden" / "is not displayed, so the page is not
+  compositing frames") and reconfirmed just before this entry (a raw `requestAnimationFrame`
+  poll ran 0 ticks in 3 s against the live dashboard). This is an environment/session
+  limitation, not an application defect — ruled out StrictMode double-mount, the `bounds`-
+  vs-`center` map-construction style, dev-vs-production build, and WebGL support (confirmed
+  working, real GPU/ANGLE renderer) as causes; a bare MapLibre map built directly in the
+  console, bypassing all app code, exhibited the identical stall; v1's live production
+  deployment showed the same `blob:`-URL network pattern when checked in the same session.
+  **What *is* verified for the dashboard:** all data loading, town switching, level
+  changes, sparse road-closure state math, and category filtering were checked at the
+  DOM/data level (not pixels) earlier in this phase and were correct; `MapView`'s
+  popup/selection code was reviewed line-by-line against v1's proven, live, working
+  pattern and is structurally faithful to it. **Recommend the owner do one real-browser
+  smoke test of the dashboard (town switch, level slider, click an asset for a popup)
+  before or shortly after deploying** — this is the one piece of Phase 3-5 that is
+  "very likely correct" rather than "directly observed working," and that gap should be
+  closed by a human, not silently assumed away.
+- No GitHub remote yet for `floodops-v2` (mirrors Phases 0-2's situation) — committed
+  locally only; same owner hand-off as before (`git remote add origin ...`, then push).
+- Dev server (port 5183) and preview server (port 4174, serving this phase's `dist/`) were
+  left running in the background for this session's verification; not stopped as part of
+  this phase — harmless to leave running, safe to kill in a future session if unneeded.
+- No dedicated Cloudflare Pages project created yet for V2 (§ Phase 3 exit criterion in the
+  guide calls for "deployed preview on a new, separate Cloudflare Pages project") — deferred
+  to the owner, same as v1's deploy step (an outward-facing action).
+
+**Next:** Owner review + (1) create `floodops-v2` GitHub remote and push, (2) create a
+Cloudflare Pages project and deploy (same manual flow as v1), (3) do the one real-browser
+dashboard smoke test noted above. No further phases are defined in the guide beyond this —
+V2's build is functionally complete pending that verification and deployment.
+
+---
+
 ## 2026-07-31 — Phase 2: Hazard acquisition + exposure engine (agent: sonnet-5)
 
 **Done — all 8 towns, all 20 levels each (160 town×level combinations):**
