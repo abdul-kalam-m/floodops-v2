@@ -4,6 +4,41 @@ Newest entry on top. Never delete entries. Format per OPERATING_GUIDE.md §13.5 
 
 ---
 
+## 2026-08-01 — Phase 6: portfolio case-study assets, staged only (agent: sonnet-5)
+
+**Scope, per owner decision:** stage materials only — do not edit the portfolio
+website's own `OPERATING_GUIDE.md` (its §10 flagship list currently names three
+unrelated, already-completed projects — AutoCarto-Agent/CartoLLM, GeoFloodFin, India
+Urban Heat Dashboard — and doesn't mention FloodOps at all; whether/how to add it there
+is the owner's positioning call, not mine). The portfolio site itself is also only at
+an early Astro scaffold (`Portfolio Projects/portfolio-staging/`, effectively its own
+Phase 0), so there's nowhere live to place a case study yet regardless.
+
+**Wrote `case-study/CASE-STUDY.md`** in this repo, in the portfolio guide's own §10
+entry format (Hook/Facts/Source/Hero) so it drops in with minimal editing whenever the
+owner decides to add it. Every number in it traces to a specific dated entry already in
+this file — none re-derived or estimated for the write-up.
+
+**Honest limitation, not glossed over:** could not save actual screenshot image files
+this session. The Browser-pane automation environment has the same intermittent
+WebGL-compositing limitation documented in the Phase 3-5 entry (confirmed again live:
+"the Browser pane is not displayed, so the page is not compositing frames"), and no
+tool available in this session can write a Browser-pane screenshot to disk as an image
+file (the screenshot action returns an inline image, not a file). Did verify the
+intended hero shot renders correctly when the pane cooperates — Hoboken at the 20 ft
+scenario shows every facility exposed (orange) with the modeled-extent fill visibly
+covering most of the town — but only as an on-screen check, not a saved file.
+`CASE-STUDY.md` documents exact URLs/levels to screenshot instead of fabricating
+placeholder images or claiming captures that don't exist.
+
+**⚠ Deviations / open items:** actual screenshot files (hero shot, Methods-page
+limitations section per the portfolio guide's explicit §14 instruction, report page)
+still need to be captured by hand — a real ~10-minute task, not done here. Live
+deployment URL also still pending owner confirmation of the Cloudflare Workers deploy,
+so `CASE-STUDY.md` has a placeholder there rather than a guessed URL.
+
+---
+
 ## 2026-08-01 — Phase 6: perf checks (agent: sonnet-5)
 
 **Ran real Lighthouse audits (`npx lighthouse`, headless Chrome, default mobile
