@@ -23,9 +23,9 @@ export default function LevelSlider({ index, levelIndex, onChange }: Props) {
       <div className="mb-1 flex items-baseline justify-between gap-3">
         <div>
           <span className="text-2xl font-semibold tabular-nums">{current.level_ft} ft</span>
-          <span className="ml-2 text-sm text-gray-500">above MHHW</span>
+          <span className="ml-2 text-sm text-gray-600">above MHHW</span>
         </div>
-        <span className="text-xs text-gray-400">{index.town}</span>
+        <span className="text-xs text-gray-600">{index.town}</span>
       </div>
 
       <input
@@ -48,7 +48,7 @@ export default function LevelSlider({ index, levelIndex, onChange }: Props) {
           return (
             <div
               key={lvl.level_ft}
-              className="absolute -translate-x-1/2 text-[10px] tabular-nums text-gray-400"
+              className="absolute -translate-x-1/2 text-[10px] tabular-nums text-gray-600"
               style={{ left: `${pct}%` }}
             >
               {showLabel ? lvl.level_ft : "·"}
@@ -57,7 +57,7 @@ export default function LevelSlider({ index, levelIndex, onChange }: Props) {
         })}
       </div>
 
-      <p className="mt-1.5 text-[11px] text-gray-400">
+      <p className="mt-1.5 text-[11px] text-gray-600">
         {min}–{max} ft range · {index.hazard_source}
       </p>
     </div>

@@ -7,7 +7,7 @@ export default function MethodsPage() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-2xl p-8 text-sm leading-relaxed text-gray-800">
+    <main className="mx-auto max-w-2xl p-8 text-sm leading-relaxed text-gray-800">
       <a href="/" className="text-blue-700 hover:underline">
         ← FloodOps V2 dashboard
       </a>
@@ -128,7 +128,7 @@ export default function MethodsPage() {
             href="https://floodops.pages.dev"
             target="_blank"
             rel="noreferrer"
-            className="text-blue-700 hover:underline"
+            className="text-blue-700 underline"
           >
             FloodOps v1
           </a>{" "}
@@ -139,6 +139,6 @@ export default function MethodsPage() {
       <section className="border-t border-gray-300 pt-4 text-xs leading-relaxed text-gray-600">
         <DisclaimerText />
       </section>
-    </div>
+    </main>
   );
 }

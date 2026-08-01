@@ -132,7 +132,7 @@ export default function ReportPage() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl p-8 print:max-w-none print:p-0">
+    <main className="mx-auto max-w-3xl p-8 print:max-w-none print:p-0">
       <div className="no-print mb-6 flex flex-wrap items-center justify-between gap-2 text-sm">
         <a href="/" className="text-blue-700 hover:underline">
           ← FloodOps V2 dashboard
@@ -154,7 +154,7 @@ export default function ReportPage() {
           </button>
         </div>
       </div>
-      <p className="no-print mb-4 text-[11px] text-gray-400">
+      <p className="no-print mb-4 text-[11px] text-gray-500">
         Tip: enable “Headers and footers” in your browser’s print dialog for page numbers
         and the date on every sheet.
       </p>
@@ -274,14 +274,14 @@ export default function ReportPage() {
       <section className="border-t border-gray-300 pt-4 text-xs leading-relaxed text-gray-600">
         <DisclaimerText />
       </section>
-    </div>
+    </main>
   );
 }
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-gray-400">{label}</dt>
+      <dt className="text-gray-500">{label}</dt>
       <dd className="font-medium">{value}</dd>
     </div>
   );

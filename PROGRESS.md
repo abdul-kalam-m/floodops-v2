@@ -4,6 +4,63 @@ Newest entry on top. Never delete entries. Format per OPERATING_GUIDE.md §13.5 
 
 ---
 
+## 2026-08-01 — Phase 6: a11y (axe) checks (agent: sonnet-5)
+
+**No existing axe/Playwright infrastructure to reuse.** Checked v1's repo first, per the
+guide's "same CI shape as v1" instruction (§12.2) — v1 never actually built this either
+(its own guide's Phase 7 was never executed; `web/package.json` and `.github/workflows/ci.yml`
+both only run lint/typecheck/build, no axe/Lighthouse/Playwright anywhere). So this was a
+real, ad-hoc scan against the live app, not a rerun of established tooling: injected real
+axe-core 4.10.0 into the Browser pane against the production build and ran it against the
+dashboard (two towns, several levels), `/report`, and `/methods`.
+
+**Found and fixed 5 real issues, all now verified clean (0 violations) on every page checked:**
+1. **Color contrast, `AssetTable`'s facility count + empty state** (serious violation):
+   `text-gray-400` (2.60:1 against white) — computed precisely (WCAG relative-luminance
+   formula, not eyeballed) that `gray-500` (4.84:1) clears the 4.5:1 AA threshold on true
+   opaque white.
+2. **Same `text-gray-400` pattern in `ReportPage`/`LevelSlider`/`Legend`** — same fix, but
+   caught a real subtlety: `LevelSlider`/`Legend` sit on `bg-white/95` translucent panels
+   *over the map*, not opaque white. `gray-500`'s 4.84:1 margin (already thin) actually
+   **failed** there (4.36:1 against the composited `#f3f3f4` backdrop observed live) —
+   caught by re-scanning a second town (Hoboken) where different content happened to be
+   in-viewport at scan time, not by the first (Newark) scan. Fixed by going one step darker,
+   `gray-600` (6.1–7.6:1 even against a much darker `#e5e7eb` worst case), for real margin
+   on a background that isn't guaranteed to be pure white. `AssetTable`/`ReportPage` stay on
+   `gray-500` since they're confirmed on true opaque white (`getComputedStyle` checked
+   directly, not assumed).
+3. **`scrollable-region-focusable`**: the facility table's scrolling container had no
+   keyboard access. Added `tabIndex={0}` + `role="region"` + `aria-label="Facilities table"`.
+4. **`landmark-one-main` + `region`, `/report` and `/methods`**: neither page had a `<main>`
+   landmark — both were a bare `<div>` at the root. Changed both to `<main>`.
+5. **`link-in-text-block`, `/methods`**: the inline "FloodOps v1" link in the Coverage
+   section was distinguished from surrounding prose text by color alone (`hover:underline`
+   only shows on hover) — fails WCAG 1.4.1. Made the underline permanent.
+
+**Methodology note, since this environment has previously had rendering-verification
+issues:** confirmed each fix against the actual rebuilt production bundle, not just the
+source diff — checked the dist JS/CSS hash changed, and once hit a false "still failing"
+result that turned out to be a stale in-page SPA state from a hash-only `navigate` call
+(changing `#town=...` without a real page reload) rather than a real regression; resolved
+by forcing an unambiguous fresh load (cache-busting query param) and confirmed clean
+immediately after. Also cross-checked axe's "incomplete" color-contrast bucket (417 nodes,
+mostly off-screen/scrolled facility-table rows axe couldn't fully verify) by reading
+`getComputedStyle` directly on a sample — actual rendered color is near-black
+(`rgb(17,24,39)`) on white, genuinely fine; not a hidden real issue, just an artifact of
+axe being conservative about elements outside the scrollable viewport at scan time.
+
+**Final state, verified across every page tested:** 0 violations. `tsc`/`eslint` clean,
+JS bundle unchanged (276.58 KB gzip — class-name-only changes).
+
+**⚠ Deviations / open items:** this was a manual, ad-hoc verification pass, not a
+permanent CI gate — no `@axe-core/playwright` (or similar) was added to
+`package.json`/`.github/workflows/ci.yml`, since that's a meaningfully larger addition
+(new dependency, new CI job, ongoing maintenance surface) that wasn't explicitly asked
+for. If a permanent, repeatable a11y gate is wanted later, that's a distinct follow-on
+decision, not implied by this entry.
+
+---
+
 ## 2026-08-01 — Clip assets/roads to municipal boundary, not the 1 km buffer (owner request, agent: sonnet-5)
 
 **Owner's reasoning (correct, and a real honesty issue, not just a cosmetic one):** the flood

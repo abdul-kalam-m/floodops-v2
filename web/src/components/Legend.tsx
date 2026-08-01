@@ -11,7 +11,7 @@ export default function Legend() {
     <div className="rounded-lg bg-white/95 p-3 text-xs shadow-lg ring-1 ring-black/5 backdrop-blur">
       <p className="mb-1.5 font-semibold text-gray-700">Legend</p>
 
-      <p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-gray-400">
+      <p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-gray-600">
         Facilities
       </p>
       <div className="mb-2 space-y-1">
@@ -26,7 +26,7 @@ export default function Legend() {
         ))}
       </div>
 
-      <p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-gray-400">Roads</p>
+      <p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-gray-600">Roads</p>
       <div className="mb-2 space-y-1">
         {ROAD_ORDER.map((s) => (
           <div key={s} className="flex items-center gap-1.5">
@@ -36,7 +36,7 @@ export default function Legend() {
         ))}
       </div>
 
-      <p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-gray-400">
+      <p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-gray-600">
         Inundation
       </p>
       <div className="mb-2 flex items-center gap-1.5">

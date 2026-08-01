@@ -122,10 +122,15 @@ export default function AssetTable({ assetsGeo, exposure, firstExposed, selected
             </option>
           ))}
         </select>
-        <span className="ml-auto text-gray-400">{filtered.length}</span>
+        <span className="ml-auto text-gray-500">{filtered.length}</span>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-auto">
+      <div
+        className="min-h-0 flex-1 overflow-auto"
+        tabIndex={0}
+        role="region"
+        aria-label="Facilities table"
+      >
         <table className="w-full border-collapse text-xs">
           <thead className="sticky top-0 bg-white text-gray-500 shadow-[0_1px_0_#e5e7eb]">
             <tr>
@@ -137,7 +142,7 @@ export default function AssetTable({ assetsGeo, exposure, firstExposed, selected
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={3} className="py-4 text-center text-gray-400">
+                <td colSpan={3} className="py-4 text-center text-gray-500">
                   No facilities match the filters.
                 </td>
               </tr>
