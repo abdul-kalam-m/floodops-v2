@@ -37,12 +37,19 @@ export default function Legend() {
       <p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-gray-400">
         Inundation
       </p>
-      <div className="flex items-center gap-1.5">
+      <div className="mb-2 flex items-center gap-1.5">
         <span
           className="inline-block h-2.5 w-3.5 shrink-0 rounded-sm"
           style={{ backgroundColor: EXPOSURE_FILL_COLOR, opacity: 0.45 }}
         />
         <span className="text-gray-600">Modeled extent</span>
+      </div>
+
+      <div className="flex items-center gap-1.5">
+        <svg width="14" height="2" className="shrink-0" aria-hidden="true">
+          <line x1="0" y1="1" x2="14" y2="1" stroke="#334155" strokeWidth="2" strokeDasharray="3,2" />
+        </svg>
+        <span className="text-gray-600">Municipal boundary</span>
       </div>
     </div>
   );
