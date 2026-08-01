@@ -1,0 +1,16 @@
+{
+  // Assets-only Worker (no server-side script) serving the static site built by
+  // `pnpm -C web build` into web/dist. Cloudflare's newer unified Workers pipeline
+  // needs this config even for a plain static site -- classic Pages (what v1 uses)
+  // didn't require one, which is why this repo had none until deploys started failing
+  // with "no specific project" errors from `wrangler deploy` at the repo root.
+  "name": "floodops-v2",
+  "compatibility_date": "2026-07-31",
+  "assets": {
+    "directory": "./web/dist",
+    // Client-side pathname routing (main.tsx picks /report, /methods, or the
+    // dashboard by pathname, no router library) -- same SPA fallback role as
+    // web/public/_redirects, which classic Pages reads but this pipeline may not.
+    "not_found_handling": "single-page-application"
+  }
+}
