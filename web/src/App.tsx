@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import MapView, { type LayerVisibility } from "./components/MapView";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import type { LayerVisibility } from "./components/MapView";
 import LevelSlider from "./components/LevelSlider";
 import TownPicker from "./components/TownPicker";
 import Legend from "./components/Legend";
@@ -20,6 +20,13 @@ import {
   prefetchNeighborLevels,
 } from "./lib/data";
 import type { ExposureJson, FirstExposedMap, GeoJson, TownEntry, TownIndexJson } from "./types";
+
+// Code-split maplibre-gl (the single largest dependency by far) into its own chunk,
+// loaded only once the shell has already painted -- Lighthouse flagged the
+// un-split bundle's parse/execute cost on throttled CPU (TBT ~1.7s, LCP ~6s) even
+// though it was well under the gzip-transfer budget (§7.4); gzip size alone doesn't
+// capture parse/execute cost, which this addresses instead of that.
+const MapView = lazy(() => import("./components/MapView"));
 
 function parseHash(): { town: string | null; level: number | null } {
   const params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
@@ -202,19 +209,27 @@ export default function App() {
         </aside>
 
         <main className="relative flex-1">
-          <MapView
-            townSlug={townSlug}
-            townBbox={activeTown.bbox}
-            assetsGeo={assetsGeo}
-            roadsGeo={roadsGeo}
-            boundaryGeo={boundaryGeo}
-            extentGeo={extentGeo}
-            exposure={exposure}
-            firstExposed={firstExposed}
-            selectedAssetId={selectedAssetId}
-            visibility={visibility}
-            onSelectAsset={onSelectAsset}
-          />
+          <Suspense
+            fallback={
+              <div className="flex h-full items-center justify-center">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
+              </div>
+            }
+          >
+            <MapView
+              townSlug={townSlug}
+              townBbox={activeTown.bbox}
+              assetsGeo={assetsGeo}
+              roadsGeo={roadsGeo}
+              boundaryGeo={boundaryGeo}
+              extentGeo={extentGeo}
+              exposure={exposure}
+              firstExposed={firstExposed}
+              selectedAssetId={selectedAssetId}
+              visibility={visibility}
+              onSelectAsset={onSelectAsset}
+            />
+          </Suspense>
           <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-3">
             <div className="flex justify-end">
               <div className="pointer-events-auto w-44">

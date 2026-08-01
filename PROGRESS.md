@@ -4,6 +4,57 @@ Newest entry on top. Never delete entries. Format per OPERATING_GUIDE.md §13.5 
 
 ---
 
+## 2026-08-01 — Phase 6: perf checks (agent: sonnet-5)
+
+**Ran real Lighthouse audits (`npx lighthouse`, headless Chrome, default mobile
+throttling), not just the gzip bundle-size check §7.4 already covers** — gzip transfer
+size and parse/execute cost are different things, and this app is well under budget on
+the former (276.58 KB gzip vs. the 400 KB cap) while still scoring poorly on the latter.
+
+**Baseline (pre-split):** Performance 48/100. FCP 2.3 s, LCP 6.0 s, TBT 1700 ms,
+CLS 0. Accessibility 100 (independently confirms the axe work above), Best Practices
+100, SEO 91. Vite's own build output already warned about a >500 KB chunk.
+
+**Tried code-splitting `maplibre-gl` out of the main bundle** (`React.lazy` + `Suspense`
+around `MapView`, the only consumer) since it's by far the largest dependency and the
+Vite warning specifically pointed at it. Main entry chunk: 276.58 KB → **55.74 KB
+gzip**; `maplibre-gl` now loads as its own 220.13 KB gzip chunk, deferred until
+`MapView` actually renders. Verified live (not just by bundle size) — canvas mounts,
+attribution/scale controls render, `MapView-*.js` fetches with 200, zero console
+errors, same interaction behavior as before.
+
+**Honest result: mixed, not a clean win.** FCP improved (2.3 s → 1.3 s) and LCP
+improved (6.0 s → 4.9 s) — both genuinely better for perceived load. **TBT got worse**
+(1700 ms → 2638 ms): splitting moved `maplibre-gl`'s parse/execute cost from *before*
+FCP (where it doesn't count toward TBT) to *after* FCP (where it does) — a known,
+common effect of code-splitting a heavy dependency the page needs almost immediately
+anyway, not a mysterious regression. Overall Performance score barely moved (48 → 52).
+
+**Calibration check, before deciding whether to chase this further:** ran the same
+Lighthouse audit against **v1's live production site** (floodops.pages.dev, real CDN,
+not localhost) for comparison, since it shares the same MapLibre-based architecture.
+Result: Performance 58/100, FCP 2.76 s, **LCP 3.84 s**, TBT 1448 ms — v1, already
+shipped and accepted, does **not** hit the guide's own aspirational "LCP ≤ 2.5 s"
+target either. This confirms the ~4-6 s LCP range is an inherent characteristic of a
+client-side MapLibre GL JS dashboard under Lighthouse's throttled-mobile simulation,
+not a defect introduced by V2's own code — v1 not code-split at all and still lands in
+the same ballpark.
+
+**Decision: kept the code-split** (real FCP/LCP gains, resolves the Vite build
+warning, no functional regression) **but did not chase the LCP/TBT numbers further.**
+Closing that gap would need a genuinely different architecture (a lighter map library,
+SSR/pre-rendering, etc.) — a real stack change, not a Phase-6 tuning pass, and one that
+would contradict §6.2's locked stack decision without the owner explicitly reopening
+it. v1 shipping successfully at a similar performance profile is the standing
+precedent that this is an acceptable tradeoff for this class of app.
+
+**⚠ Deviations / open items:** performance does not meet the guide's aspirational
+LCP ≤ 2.5 s figure (inherited from v1's own §1.4, which v1 itself doesn't meet either
+in production) — flagged here rather than silently left unmentioned or falsely
+reported as passing.
+
+---
+
 ## 2026-08-01 — Phase 6: a11y (axe) checks (agent: sonnet-5)
 
 **No existing axe/Playwright infrastructure to reuse.** Checked v1's repo first, per the
