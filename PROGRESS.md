@@ -4,6 +4,84 @@ Newest entry on top. Never delete entries. Format per OPERATING_GUIDE.md §13.5 
 
 ---
 
+## 2026-08-08 — OPERATING_GUIDE.md v1.0 → v1.1: Amendment A1 (owner + agent: sonnet-5)
+
+**Guide-only change — no pipeline or web code touched.** Applied identically to this
+repo's `OPERATING_GUIDE.md` and the canonical portfolio copy (`6. PORTFOLIO/10. FLOODOPS
+V2/OPERATING_GUIDE.md`) — confirmed byte-identical after copying, not just assumed. Two
+independent parts, bundled because both arose in the same session; either could in
+principle be reverted without touching the other.
+
+**Part 1 — reopens §13.3's extent-only lock, narrowly (owner decision, reopening a
+previously hard-locked item).** Adds per-asset **point depth** at facilities (new §5.6):
+`d_ft = max(0, WSE_navd88 − ground_elev)`, computed only inside a level's Rutgers extent.
+The only new input is a per-town MHHW→NAVD88 offset (§5.6.2) — NOAA VDatum primary, NOAA
+CO-OPS station cross-check, must agree within 0.25 ft or that town ships without depth
+(§5.6.4, a hard per-town degradation path, not a global on/off switch). Depth is reported
+at 0.5 ft precision only (§5.6.3) — the error budget (EPQS vertical error + the datum
+scalar approximation + Rutgers' extents coming from a different elevation model) is on
+the order of the 1 ft level spacing itself, so anything finer would be false precision.
+Restores the 4-tier facility status (§5.3: `exposed`/`isolated`/`access-threatened`/
+`operational`) for towns that pass the gate; towns that don't keep the original 3-tier
+model unchanged — genuinely zero regression for a failing town. New §5.6.5
+"disagreement rate" requires the validator to report (never suppress) how often
+Rutgers' extent and this project's elevation subtraction disagree (asset inside the
+extent, computed depth still 0) — that's the honesty mechanic load-bearing for the
+Methods-page framing in Part 2 below.
+
+**Explicitly still out of scope (§2.2/§2.3), and why:** a depth *surface* (DEM raster,
+classed map ramp) — Newark's single-class 20 ft extent is already ~1.05 MB gzip of the
+5 MB per-town budget (§7.4), and a 4-class breakdown would multiply per-level vertex
+count 2.5–4×, very likely forcing a GeoJSON→raster-tile/PMTiles architecture change this
+phase does not take on. Road-segment depth — would re-import v1's 6 ft cap and
+`bridge_suspected` machinery for a DEM-under-bridge-deck problem this project deliberately
+avoided by staying extent-only for roads. A spatially-varying MHHW grid — the per-town
+scalar is a known, documented approximation, not the true field.
+
+**Part 2 — retires the v1/v2 "portfolio pair" narrative (owner directive: V1 and V2 are
+separate projects; v1's shipping status is undecided; V2 is the likelier flagship).**
+Removed every public-facing v1 reference: the standing disclaimer's "(see FloodOps v1)"
+parenthetical, the Methods-page "(link to v1 for a riverine example)" instruction, §1.2's
+"presented as a pair with v1" / "flagship candidate, alongside v1" framing, and §14
+Portfolio integration (rewritten — V2 now stands on its own merits, no comparison to v1).
+Added a standing prohibition (§13.4): no public-facing copy — disclaimer, Methods page,
+README, case-study, site nav, report output — may name or link FloodOps v1 going forward.
+Internal engineering references (reading v1's guide for shared design-token/testing
+conventions, §6.2) are explicitly unaffected — this is about visitor-facing copy only.
+
+**Also corrected while in the guide:** the header `Status` line still read "Not started
+(no repository exists yet)" — stale relative to the actual build (Phases 0–6 complete,
+live on Cloudflare Workers per the 2026-08-01 entries below). Left uncorrected it would
+have made the new Phase 7 row self-contradictory in the same document, so updated it to
+state the real phase status plus "Phase 7 not yet started."
+
+**⚠ Deviations / open items — real, not hypothetical, and worth the owner's attention
+before Phase 7 starts:**
+- **The live production app currently violates the just-adopted §13.4 no-v1-reference
+  rule.** Per the 2026-07-31 Phase 3-5 entry below, `MethodsPage.tsx` was written with "a
+  coverage note linking to v1 for a riverine example," and per the 2026-08-01 a11y entry,
+  that same inline "FloodOps v1" link was specifically fixed for a contrast/underline
+  issue (`link-in-text-block`) — i.e. it's real, shipped, and currently live, not a
+  guide-only hypothetical. The guide text is now ahead of the app code on this point.
+  Removing that link is a small, low-risk, independent cleanup — does not need to wait
+  for Phase 7's depth work, and is a reasonable candidate to prioritize separately.
+- Phase 7.0 (datum recon — the MHHW→NAVD88 gate) has not been run. No town's
+  `depth_available` has been verified live yet; `04b_fetch_datums.py` does not exist.
+  Until Phase 7 executes, the deployed app still runs the pre-amendment 3-tier-everywhere
+  model — the guide describes the target state, not the current one.
+- The disclaimer text and Methods-page copy in the guide (§5.7) are the *target* strings
+  for Phase 7.5 — the live app's actual disclaimer/Methods components still have the
+  pre-amendment wording (including the v1 cross-reference above) and have not been
+  touched.
+
+**Next:** Phase 7.0 — verify EPQS units/vertical datum live; resolve the MHHW offset per
+town via VDatum + CO-OPS; apply the 0.25 ft gate; compute the real §5.6.3 error budget;
+write findings to `RECON.md`. Hard gate per the guide's own instruction: if datum
+verification fails broadly across towns, stop and revert Part 1 rather than ship depths
+that can't be sourced. Part 2 stands regardless of Phase 7.0's outcome.
+
+---
+
 ## 2026-08-01 — Phase 6: portfolio case-study assets, staged only (agent: sonnet-5)
 
 **Scope, per owner decision:** stage materials only — do not edit the portfolio
