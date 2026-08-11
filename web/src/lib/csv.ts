@@ -68,7 +68,7 @@ export function csvFilename(townSlug: string, levelFt: number): string {
   const ymd =
     `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}` +
     `${String(d.getDate()).padStart(2, "0")}`;
-  return `floodops-v2_${townSlug}_level${levelFt}ft_${ymd}.csv`;
+  return `floodops_${townSlug}_level${levelFt}ft_${ymd}.csv`;
 }
 
 export function downloadCsv(filename: string, content: string): void {

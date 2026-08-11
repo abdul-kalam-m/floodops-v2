@@ -4,6 +4,60 @@ Newest entry on top. Never delete entries. Format per OPERATING_GUIDE.md §13.5 
 
 ---
 
+## 2026-08-11 — Display name: "FloodOps V2" → "FloodOps" in the deployed app only (owner decision, agent: sonnet-5)
+
+**Owner decision:** the deployed product should read as "FloodOps," not "FloodOps V2" —
+"V2" stays a GitHub-repo/engineering-side distinction (repo name `floodops-v2`,
+`package.json`, `wrangler.jsonc`'s Worker name, this guide's own project identity),
+never something an end user sees.
+
+**Found and fixed every user-facing "V2" mention (grepped `web/`, not just the obvious
+spots):**
+- `index.html` `<title>`, and both `ReportPage.tsx`/`MethodsPage.tsx`'s `document.title`.
+- The dashboard header `<h1>` (`App.tsx`) — the actual on-page logo/title text.
+- "← FloodOps V2 dashboard" back-links on both `/report` and `/methods`.
+- The report header (`FloodOps V2 Exposure Report — {town}, {state}`).
+- `MethodsPage.tsx`'s NAVD88-comparison sentence and Coverage-section sentence.
+- `DisclaimerText.tsx`'s rendered disclaimer paragraph (shown on every page + every
+  printed report).
+- **`csv.ts`'s `csvFilename()`** — the actual downloaded file name
+  (`floodops-v2_{town}_level{N}ft_{date}.csv` → `floodops_...`). Easy to miss since
+  it's not on-screen text, but it's still something the user sees (their downloads
+  folder), so it's in scope the same as any other UI string.
+
+**Left alone, deliberately:** every "V2" occurrence in a code comment (`types.ts`,
+`LevelSlider.tsx`, `palette.ts`, `csv.ts`'s header comment, `DisclaimerText.tsx`'s NOTE
+comment) — not rendered, matches the repo-identity carve-out. `package.json` (`name:
+"floodops-v2"`, `"@floodops-v2/web"`) and `wrangler.jsonc` (`name: "floodops-v2"`) —
+also not rendered, and `wrangler.jsonc`'s name is the actual Cloudflare Worker
+identifier; renaming it is an infrastructure change (risks the deploy's git-integration
+link and possibly its default subdomain) that was flagged to the owner rather than done
+silently. Checked pipeline-generated data files in `web/public/data/` for embedded
+branding strings — none found, only factual fields like `hazard_source`.
+
+**Guide sync:** `OPERATING_GUIDE.md`'s own project-identity references (title, §1.1,
+the v1/V2 comparison table, §1.2, §14) are unchanged — per the owner's own framing,
+those are the repo/engineering-side name. The one place the guide specifies literal
+*rendered* copy — the locked §5.7 disclaimer text block — was updated to match
+("FloodOps V2 uses Rutgers..." → "FloodOps uses Rutgers..."), since that block is a
+Phase 7.5 implementation target, not project narrative; leaving it unfixed would have
+silently reintroduced "V2" into the disclaimer whenever Phase 7 ships. Added a dated
+note to §8 recording the display-name/engineering-name split explicitly, so a future
+session doesn't "fix" them back into sync. Re-synced to the canonical portfolio copy —
+confirmed byte-identical after copying, not just assumed.
+
+**Verified, not just edited:** `tsc --noEmit` and `eslint .` both 0 errors (same
+pre-existing unrelated `main.tsx` warning). Live dev-server check of `/`, `/report`,
+and `/methods`: dashboard `<h1>` reads "FloodOps" (checked via direct DOM query, since
+it sits outside `<main>` and `get_page_text` alone wouldn't have caught it), both page
+titles updated, report header/disclaimer/Methods copy all read "FloodOps" with zero
+"V2" anywhere in rendered text. 0 console errors on any page.
+
+**⚠ Deviations / open items:** none new. Not committed/pushed yet — pending owner
+go-ahead, same as this session's other changes.
+
+---
+
 ## 2026-08-11 — Fix: remove FloodOps v1 references from MethodsPage.tsx (owner + agent: sonnet-5)
 
 **Closes the open item flagged in the entry below.** The live Methods page had **5**

@@ -3,13 +3,13 @@ import DisclaimerText from "../components/DisclaimerText";
 
 export default function MethodsPage() {
   useEffect(() => {
-    document.title = "FloodOps V2 — Methods";
+    document.title = "FloodOps — Methods";
   }, []);
 
   return (
     <main className="mx-auto max-w-2xl p-8 text-sm leading-relaxed text-gray-800">
       <a href="/" className="text-blue-700 hover:underline">
-        ← FloodOps V2 dashboard
+        ← FloodOps dashboard
       </a>
 
       <h1 className="mb-4 mt-4 text-2xl font-bold text-gray-900">Methods</h1>
@@ -35,7 +35,7 @@ export default function MethodsPage() {
           at a given station, averaged over a 19-year tidal epoch. MHHW is <em>not</em> the
           same reference surface as <strong>NAVD88</strong> (North American Vertical Datum of
           1988, a fixed geodetic datum), and the offset between the two varies by location
-          along the coast. That means a FloodOps V2 level is <strong>not directly comparable</strong>{" "}
+          along the coast. That means a FloodOps level is <strong>not directly comparable</strong>{" "}
           to an elevation given in NAVD88, nor to a National Weather Service river-gauge flood
           stage — those are measured against a different reference system entirely.
         </p>
@@ -118,7 +118,7 @@ export default function MethodsPage() {
       <section className="mb-6">
         <h2 className="mb-2 text-lg font-semibold text-gray-900">Coverage</h2>
         <p>
-          FloodOps V2 covers a fixed set of NJ coastal and tidal-influenced municipalities,
+          FloodOps covers a fixed set of NJ coastal and tidal-influenced municipalities,
           one town at a time — it does not extend to non-tidal parts of New Jersey.
         </p>
       </section>

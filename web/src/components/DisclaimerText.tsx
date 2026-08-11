@@ -7,7 +7,7 @@ export default function DisclaimerText() {
   return (
     <p>
       <strong>Planning demonstration only — exposure screening, not a depth model.</strong>{" "}
-      FloodOps V2 uses Rutgers University&rsquo;s NJ Coastal Inundation Explorer, a
+      FloodOps uses Rutgers University&rsquo;s NJ Coastal Inundation Explorer, a
       statewide static model referenced to Mean Higher High Water (MHHW), a local tidal
       datum. This dashboard shows whether an asset or road falls inside a modeled
       inundation footprint at a given water level — it does not compute flood depth, and

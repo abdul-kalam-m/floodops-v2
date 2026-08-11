@@ -39,7 +39,7 @@ export default function ReportPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    document.title = "FloodOps V2 — Exposure Report";
+    document.title = "FloodOps — Exposure Report";
     const { town: qTown } = paramsFromQuery();
     loadTowns()
       .then(async (list) => {
@@ -135,7 +135,7 @@ export default function ReportPage() {
     <main className="mx-auto max-w-3xl p-8 print:max-w-none print:p-0">
       <div className="no-print mb-6 flex flex-wrap items-center justify-between gap-2 text-sm">
         <a href="/" className="text-blue-700 hover:underline">
-          ← FloodOps V2 dashboard
+          ← FloodOps dashboard
         </a>
         <div className="flex items-center gap-2">
           <button
@@ -162,7 +162,7 @@ export default function ReportPage() {
       {/* (1) Header */}
       <header className="mb-6 border-b border-gray-300 pb-4">
         <h1 className="text-2xl font-bold text-gray-900">
-          FloodOps V2 Exposure Report — {index.town}, {index.state}
+          FloodOps Exposure Report — {index.town}, {index.state}
         </h1>
         <p className="mt-1 text-gray-600">
           {levelFt} ft above MHHW · {index.hazard_source}

@@ -161,7 +161,7 @@ export default function App() {
       <header className="z-10 flex items-center justify-between gap-4 bg-white px-4 py-2 shadow-sm">
         <div className="flex items-center gap-3">
           <div>
-            <h1 className="text-lg font-bold text-gray-900">FloodOps V2</h1>
+            <h1 className="text-lg font-bold text-gray-900">FloodOps</h1>
             <p className="text-xs text-gray-500">
               NJ coastal flood exposure explorer · {index.hazard_source}
             </p>
