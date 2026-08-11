@@ -37,9 +37,7 @@ export default function MethodsPage() {
           1988, a fixed geodetic datum), and the offset between the two varies by location
           along the coast. That means a FloodOps V2 level is <strong>not directly comparable</strong>{" "}
           to an elevation given in NAVD88, nor to a National Weather Service river-gauge flood
-          stage. FloodOps v1 (Bound Brook, on the Raritan River) uses NWS gauge stages in
-          NAVD88-referenced terms — a genuinely different measurement system from this tool,
-          even though both are called &ldquo;FloodOps.&rdquo;
+          stage — those are measured against a different reference system entirely.
         </p>
       </section>
 
@@ -53,9 +51,9 @@ export default function MethodsPage() {
             or outside a modeled inundation footprint — never how deep the water is there.
           </li>
           <li>
-            <strong>No first-floor height comparison.</strong> Unlike FloodOps v1, ground
-            elevation is not compared against a water-surface elevation, because there is no
-            depth value to compare it against. First-floor height is not modeled at all here.
+            <strong>No first-floor height comparison.</strong> Ground elevation is not compared
+            against a water-surface elevation in this build, because there is no depth value to
+            compare it against. First-floor height is not modeled at all here.
           </li>
           <li>
             <strong>No building-level survey.</strong> A facility&rsquo;s status is computed
@@ -93,9 +91,9 @@ export default function MethodsPage() {
           </tbody>
         </table>
         <p className="mt-2 text-gray-600">
-          There is no fourth &ldquo;access-threatened&rdquo; tier. FloodOps v1 used that tier
-          to represent shallow or partial water at a facility, which requires a depth value
-          this model deliberately does not compute.
+          There is no fourth &ldquo;access-threatened&rdquo; tier in this build — that tier
+          would represent shallow or partial water at a facility, which requires a depth value
+          this model does not currently compute.
         </p>
       </section>
 
@@ -104,8 +102,8 @@ export default function MethodsPage() {
         <p>
           A road segment is <strong>closed</strong> if it intersects the level&rsquo;s extent
           polygon (same 20 m tolerance), otherwise <strong>open</strong>. There is no graded
-          &ldquo;caution&rdquo; tier — that distinction in v1 was depth-derived and has no
-          extent-only equivalent.
+          &ldquo;caution&rdquo; tier — that distinction would be depth-derived, and road segments
+          don&rsquo;t have a computed depth here.
         </p>
       </section>
 
@@ -113,8 +111,7 @@ export default function MethodsPage() {
         <h2 className="mb-2 text-lg font-semibold text-gray-900">Access-loss rule</h2>
         <p>
           A facility loses access when every road segment within 120 m of it (nearest-segment
-          fallback if none fall within that radius) is closed — the same proximity rule used
-          in FloodOps v1.
+          fallback if none fall within that radius) is closed.
         </p>
       </section>
 
@@ -122,17 +119,7 @@ export default function MethodsPage() {
         <h2 className="mb-2 text-lg font-semibold text-gray-900">Coverage</h2>
         <p>
           FloodOps V2 covers a fixed set of NJ coastal and tidal-influenced municipalities,
-          one town at a time — it does not extend to non-tidal parts of New Jersey. For a
-          riverine (non-tidal, gauge-based) flood example, see{" "}
-          <a
-            href="https://floodops.pages.dev"
-            target="_blank"
-            rel="noreferrer"
-            className="text-blue-700 underline"
-          >
-            FloodOps v1
-          </a>{" "}
-          (Bound Brook, on the Raritan River).
+          one town at a time — it does not extend to non-tidal parts of New Jersey.
         </p>
       </section>
 

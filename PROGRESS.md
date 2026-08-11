@@ -4,6 +4,42 @@ Newest entry on top. Never delete entries. Format per OPERATING_GUIDE.md §13.5 
 
 ---
 
+## 2026-08-11 — Fix: remove FloodOps v1 references from MethodsPage.tsx (owner + agent: sonnet-5)
+
+**Closes the open item flagged in the entry below.** The live Methods page had **5**
+separate "FloodOps v1" mentions, not just the one clickable link originally flagged: a
+"MHHW vs. NAVD88" paragraph naming v1/Bound Brook as the contrasting gauge-based system,
+"Unlike FloodOps v1" in the no-first-floor-height-comparison bullet, "FloodOps v1 used
+that tier" in the facility-status no-`access-threatened`-tier note, "that distinction in
+v1" in the road-status no-`caution`-tier note, "the same proximity rule used in FloodOps
+v1" in the access-loss rule, and the Coverage section's clickable link to
+floodops.pages.dev with "FloodOps v1" anchor text. Fixing only the link would have left
+the page still non-compliant with the §13.4 rule just adopted, so all five were removed.
+
+**Kept the substance, dropped the comparison.** Each rewrite states the same underlying
+fact — NAVD88/gauge-stage incomparability, no first-floor modeling, no
+`access-threatened`/`caution` tier without a computed depth, the 120 m access-loss
+radius, per-town tidal-only coverage — without naming or linking v1. Checked
+`DisclaimerText.tsx` too: its rendered `<p>` text never named v1; the only match was an
+internal code comment (`// NOTE: ... distinct from FloodOps v1's depth-model
+disclaimer`), which is exactly the kind of internal engineering reference the guide's
+Part 2 explicitly permits — left untouched.
+
+**Verified, not just edited:** `tsc --noEmit` and `eslint .` both 0 errors (the one
+pre-existing `main.tsx` fast-refresh warning is unrelated, already documented in the
+Phase 3-5 entry below). Started the dev server, loaded `/methods` live, pulled the
+rendered text directly via `get_page_text` — zero "v1" or "floodops.pages.dev" anywhere,
+page reads coherently end to end. 0 console errors; all network requests 200 (checked
+directly, not assumed). Pixel screenshot hit the same Browser-pane
+`requestAnimationFrame`-suspension limitation already diagnosed at length in the Phase
+3-5 and case-study entries below (a session/environment issue, not an app defect,
+per that prior diagnosis) — text/DOM/network verification stood in for it, same
+workaround already established for this app. Dev server stopped after verification.
+
+**⚠ Deviations / open items:** none new.
+
+---
+
 ## 2026-08-08 — OPERATING_GUIDE.md v1.0 → v1.1: Amendment A1 (owner + agent: sonnet-5)
 
 **Guide-only change — no pipeline or web code touched.** Applied identically to this
