@@ -3,10 +3,12 @@ import {
 } from "../lib/palette";
 import type { AssetStatus, RoadStatus } from "../types";
 
-const ASSET_ORDER: AssetStatus[] = ["operational", "isolated", "exposed"];
+const ASSET_ORDER_3TIER: AssetStatus[] = ["operational", "isolated", "exposed"];
+const ASSET_ORDER_4TIER: AssetStatus[] = ["operational", "access-threatened", "isolated", "exposed"];
 const ROAD_ORDER: RoadStatus[] = ["open", "closed"];
 
-export default function Legend() {
+export default function Legend({ statusModel }: { statusModel: "3-tier" | "4-tier" }) {
+  const assetOrder = statusModel === "4-tier" ? ASSET_ORDER_4TIER : ASSET_ORDER_3TIER;
   return (
     <div className="rounded-lg bg-white/95 p-3 text-xs shadow-lg ring-1 ring-black/5 backdrop-blur">
       <p className="mb-1.5 font-semibold text-gray-700">Legend</p>
@@ -15,7 +17,7 @@ export default function Legend() {
         Facilities
       </p>
       <div className="mb-2 space-y-1">
-        {ASSET_ORDER.map((s) => (
+        {assetOrder.map((s) => (
           <div key={s} className="flex items-center gap-1.5">
             <span
               className="inline-block h-2.5 w-2.5 shrink-0 rounded-full ring-1 ring-white"

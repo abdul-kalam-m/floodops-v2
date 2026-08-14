@@ -3,7 +3,7 @@
 **Project:** FloodOps V2 — Multi-Municipality Coastal Flood Exposure Explorer (New Jersey)
 **Owner:** Abdul Kalam Azad Mustaq (ar.abdulkalam.mustaq@gmail.com)
 **Guide version:** 1.1 — written 2026-07-22, amended 2026-08-08 (Amendment A1 — see §16 Changelog)
-**Status:** Phases 0–6 complete; deployed live on Cloudflare Workers (`floodops-v2` repo, `github.com/abdul-kalam-m/floodops-v2`). Phase 7 (this amendment — Tier 1 point depth) not yet started as of 2026-08-08.
+**Status:** Phases 0–7 complete (built locally 2026-08-14; not yet pushed/redeployed — see `PROGRESS.md`). 7/8 towns have computed facility depth (Camden ships extent-only, §5.6.4 — a real VDatum coverage gap, not a disagreement). Deployed production still reflects pre-Phase-7 state (Cloudflare Workers, `floodops-v2` repo, `github.com/abdul-kalam-m/floodops-v2`) until pushed.
 **Guide location (canonical):** `C:\Users\abdul\Desktop\Temporary Files\RUTGERS\6. PORTFOLIO\10. FLOODOPS V2\OPERATING_GUIDE.md`
 **Prior project (internal reference only):** FloodOps v1 (`4. FLOODOPS\`, repo `C:\Users\abdul\Documents\GitHub\floodops`) established the design tokens, testing philosophy, and agent protocol this guide reuses — read its guide for those conventions; this guide only specifies what's **new or different**. **V1 and V2 are independent products with independent shipping decisions. No instruction in this guide assumes v1 is published, live, or presented alongside V2** — that assumption was retired 2026-08-08 (§16).
 
@@ -467,6 +467,8 @@ FloodOps V2 is presented as its own project in the portfolio's Geospatial Intell
 **v1.1 — Amendment A1 (2026-08-08):** two independent changes, applied together because both arose in the same session.
 - **Part 1 (Tier 1 point depth):** reopened §13.3's extent-only lock, narrowly. Added per-asset point depth at facilities (§5.6), using v2's already-fetched EPQS ground elevation plus one new input — a per-town MHHW→NAVD88 offset (§5.6.2), gated at 0.25 ft agreement between NOAA VDatum and CO-OPS. Restores the 4-tier facility status (§5.3) for towns that pass the gate; depth-optional degradation (§5.6.4) means a failing town ships exactly as v1.0 specified, no regression. Reported at 0.5 ft precision only (§5.6.3). Explicitly still out of scope: a depth surface/DEM raster, road-segment depth, and the 4-class map ramp (§2.2, §2.3) — the map fill stays single-class for payload reasons (§7.4: Newark's single-class 20 ft extent is already ~1.05 MB gzip of a 5 MB budget). New §5.6.5 requires reporting (never suppressing) the rate at which Rutgers' extent and this project's elevation subtraction disagree.
 - **Part 2 (standalone portfolio framing):** retired the v1/v2 "pair" narrative (owner directive — v1's shipping status is undecided, V2 is the likelier flagship). Removed every public-facing reference to FloodOps v1 (disclaimer, Methods page, §1.1/§1.2 framing, §14 Portfolio integration); added a standing prohibition (§13.4) against naming or linking v1 in any public-facing copy. Internal engineering references to v1 (shared code/design-token conventions, §6.2) are unaffected.
+
+**Phase 7 executed (2026-08-14, no guide version bump — this amendment's spec, above, did not change):** built and verified per §11's Phase 7 row. 7/8 towns pass the §5.6.2 datum gate; Camden ships extent-only (a genuine VDatum coverage gap, not a disagreement — see `RECON.md`). All §12.1 assertions and the regression check pass; disagreement rates (§5.6.5) are real and reported on `/methods`. Full details in `PROGRESS.md`, 2026-08-14 entry.
 
 ---
 

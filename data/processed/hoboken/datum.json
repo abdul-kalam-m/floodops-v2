@@ -1,0 +1,29 @@
+{
+  "slug": "hoboken",
+  "town": "Hoboken",
+  "depth_available": true,
+  "water_point": [
+    -74.026,
+    40.74657
+  ],
+  "mhhw_navd88_ft": 2.303,
+  "datum_source": {
+    "vdatum_ft": 2.303,
+    "vdatum_uncertainty_ft": 0.209,
+    "coops_station_id": "8518750",
+    "coops_station_name": "The Battery",
+    "coops_dist_km": 5.21,
+    "coops_ft": 2.28,
+    "coops_epoch": "1983-2001",
+    "retrieved_utc": "2026-08-14T00:03:47.909498+00:00"
+  },
+  "diagnostic": {
+    "vdatum_ft": 2.303,
+    "coops_ft": 2.28,
+    "coops_station_id": "8518750",
+    "coops_station_name": "The Battery",
+    "coops_dist_km": 5.21,
+    "diff_ft": 0.023,
+    "reason": "pass"
+  }
+}

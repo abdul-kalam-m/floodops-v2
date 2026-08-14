@@ -280,3 +280,100 @@ def manifest_add(name: str, source_url: str, path: Path | None,
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+# --- Phase 7 (§5.6): MHHW -> NAVD88 datum offset, per town -------------------
+# Two independent sources per §5.6.2 (LOCKED): NOAA VDatum (primary) + NOAA CO-OPS
+# station datums (cross-check), gated at 0.25 ft agreement. Verified live 2026-08-11:
+#   - VDatum's tidal grid does NOT cover every point inside a town's own MHHW extent
+#     polygon -- it has real internal gaps (a genuine server-side error, HTTP 200 with
+#     body {"errorCode":412,...}, not a timeout/flake). A caller must try multiple
+#     candidate points (every disconnected part of the extent, not just the largest)
+#     before concluding "no coverage here."
+#   - CO-OPS's small ~15-station "major stations" list is a poor proxy in a bay/river
+#     town (diffs of 0.4-0.5 ft against VDatum at some points) -- the much larger
+#     ~2,900-station "historicwl" catalog (subordinate stations, many literally inside
+#     Newark Bay / the Hackensack / the Raritan at each town) resolves this: nearest
+#     real station with a *published* NAVD88 tie-in is what matters, not nearest
+#     station overall. Many subordinate stations have `"datums": null` (no accepted
+#     datums at all) -- a normal HTTP 200, not an error; the caller must skip these
+#     and keep trying the next-nearest station.
+VDATUM_CONVERT = "https://vdatum.noaa.gov/vdatumweb/api/convert"
+COOPS_STATIONS = "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations.json"
+COOPS_DATUMS = "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/{id}/datums.json"
+
+
+def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    import math
+    R = 6371.0
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dphi, dl = math.radians(lat2 - lat1), math.radians(lon2 - lon1)
+    a = math.sin(dphi / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
+    return 2 * R * math.asin(math.sqrt(a))
+
+
+def vdatum_mhhw_navd88_ft(lon: float, lat: float, force: bool = False) -> tuple[float | None, dict]:
+    """MHHW expressed in NAVD88 feet at (lon, lat): query s_v_frame=MHHW, s_z=0.0,
+    t_v_frame=NAVD88 -- the direction that gives §5.6.1's MHHW_navd88_ft(town) directly,
+    with no manual sign-flip. Returns (None, raw_response) if this point falls outside
+    VDatum's tidal-grid coverage (t_z == -999999 or an errorCode body)."""
+    r = get_json(VDATUM_CONVERT, params={
+        "s_x": lon, "s_y": lat, "s_z": 0.0, "s_v_frame": "MHHW", "s_v_unit": "us_ft",
+        "t_v_frame": "NAVD88", "t_v_unit": "us_ft", "region": "contiguous",
+    }, force=force, retries=2, timeout=30)
+    t_z = r.get("t_z")
+    if t_z in (None, "-999999", -999999) or "errorCode" in r:
+        return None, r
+    return float(t_z), r
+
+
+def coops_all_stations(force: bool = False) -> list[dict]:
+    """Every CO-OPS station with a lat/lon, combining the 'waterlevels' (active,
+    full-record) and 'historicwl' (subordinate/historic, ~2,900 stations -- verified
+    2026-08-11 this is where the town-adjacent stations actually live, e.g. Port
+    Elizabeth/Newark Bay, Kearny Point/Hackensack River, New Brunswick/Raritan River)
+    catalogs. Deduped by station id."""
+    seen: dict[str, dict] = {}
+    for typ in ("waterlevels", "historicwl"):
+        data = get_json(COOPS_STATIONS, params={"units": "english", "type": typ},
+                        force=force, retries=3, timeout=60)
+        for s in data.get("stations", []):
+            seen[s["id"]] = s
+    return list(seen.values())
+
+
+def coops_station_datums(station_id: str, force: bool = False) -> dict:
+    return get_json(COOPS_DATUMS.format(id=station_id), params={"units": "english"},
+                    force=force, retries=2, timeout=20)
+
+
+def coops_mhhw_navd88_ft(station_id: str, force: bool = False) -> tuple[float | None, dict]:
+    """MHHW-relative-to-NAVD88, in feet, from a station's own published datums (the
+    subtraction cancels the station's arbitrary local zero, so it's valid even though
+    individual datum VALUES are station-datum-relative, not NAVD88-relative directly).
+    Returns (None, raw) if the station has no accepted datums, or lacks NAVD88 (common
+    for subordinate stations never leveled to a benchmark) or MHHW."""
+    raw = coops_station_datums(station_id, force=force)
+    datums = {d["name"]: d["value"] for d in (raw.get("datums") or [])}
+    if "MHHW" not in datums or "NAVD88" not in datums:
+        return None, raw
+    return round(datums["MHHW"] - datums["NAVD88"], 3), raw
+
+
+def town_water_candidates(extent_0_path) -> list[tuple[float, float]]:
+    """Candidate (lon, lat) points to try against VDatum for a town: the union's own
+    representative_point(), its centroid, then EVERY disconnected part's
+    representative_point(), largest-area first. Trying every part (not just the
+    largest) matters -- confirmed live 2026-08-11 (Atlantic City): VDatum's grid gap
+    can sit under the largest part while a smaller, separate part of the same MHHW
+    extent resolves fine."""
+    import geopandas as gpd
+    gdf = gpd.read_file(extent_0_path).to_crs(WGS84)
+    union = gdf.union_all()
+    parts = list(union.geoms) if hasattr(union, "geoms") else [union]
+    parts.sort(key=lambda g: g.area, reverse=True)
+    pts = [(union.representative_point().x, union.representative_point().y),
+           (union.centroid.x, union.centroid.y)]
+    for p in parts:
+        pts.append((p.representative_point().x, p.representative_point().y))
+    return pts

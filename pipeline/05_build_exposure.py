@@ -2,11 +2,17 @@
 """05 — Build the §5 exposure model into the §7 web data contracts, per town.
 
 For each town, for each level it has raw hazard data for (04_fetch_hazard.py's output):
-  - road status (2-tier, §5.4): closed if the segment intersects the level's extent
-    (with the same 20 m source-alignment tolerance v1 used, §13.2), else open.
-  - facility status (3-tier, §5.3): exposed if the point falls inside the (tolerant)
-    extent; isolated if not exposed but every access road (120 m proximity, §5.5,
-    same rule as v1) is closed; operational otherwise.
+  - road status (2-tier, §5.4, unchanged by Phase 7): closed if the segment intersects
+    the level's extent (with the same 20 m source-alignment tolerance v1 used, §13.2),
+    else open. Roads never get a computed depth (§2.2, locked).
+  - facility status (§5.3): extent membership is always computed first and is always
+    the primary signal. Towns with a gated MHHW->NAVD88 offset (04b_fetch_datums.py,
+    §5.6.4) get the 4-tier depth-graded model (exposed/isolated/access-threatened/
+    operational); towns without one keep the original 3-tier extent-only model
+    (exposed/isolated/operational) -- a hard per-town degradation path, not a toggle.
+  - point depth (§5.6, depth-available towns only): d_ft = max(0, WSE_navd88 - ground
+    elevation), computed ONLY inside the extent, rounded to the nearest 0.5 ft. Always
+    null for non-depth-available towns, never a placeholder 0.
   - summary counts + road-closed miles.
 Then first_exposed.json (first level, ascending, at which each asset's status != operational)
 and the per-town index.json + a top-level towns.json registry.
@@ -111,6 +117,56 @@ def build_access_adjacency(assets_utm: gpd.GeoDataFrame,
     return out
 
 
+def load_datum(slug: str) -> dict:
+    """Phase 7 (§5.6): the per-town MHHW->NAVD88 offset, written by 04b_fetch_datums.py.
+    Missing file (04b not yet run) degrades to depth_available=False rather than
+    crashing -- lets 05 still be run standalone during Phase 0-6 style iteration."""
+    path = fl.PROCESSED / slug / "datum.json"
+    if not path.exists():
+        return {"depth_available": False, "mhhw_navd88_ft": None, "datum_source": None}
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def classify_asset_4tier(depth_ft: float, ffo: float, all_closed: bool,
+                         any_closed: bool) -> tuple[str, bool]:
+    """§5.3, 4-tier, worst-wins cascade -- pure function, unit-tested directly
+    (pipeline/tests/test_pipeline.py) rather than only exercised indirectly through
+    a full town build. Order matters: "exposed" is d>=ffo (NOT merely in_extent,
+    unlike the 3-tier model), so a facility can sit inside the extent with only a
+    few inches of depth and still land in access-threatened rather than exposed.
+
+    access_lost is the real all-access-roads-closed fact in every branch, including
+    "exposed" -- deliberately different from the 3-tier model, which hardcodes
+    access_lost=True whenever a facility is exposed (a simplifying assumption from
+    before depth existed). With a real depth number available, that assumption isn't
+    needed -- a flooded facility whose roads are still genuinely open is worth
+    reporting as such, not flattened to "lost" by convention.
+    """
+    if depth_ft >= ffo:
+        return "exposed", all_closed
+    if all_closed:
+        return "isolated", True
+    if (0.0 < depth_ft < ffo) or any_closed:
+        return "access-threatened", all_closed
+    return "operational", False
+
+
+def classify_asset_3tier(in_extent: bool, all_closed: bool) -> tuple[str, bool]:
+    """Original pre-Phase-7 model (§5.3, depth_available=False towns) -- unchanged
+    behavior, extracted verbatim into a pure function for the same testability."""
+    if in_extent:
+        return "exposed", True
+    return ("isolated", True) if all_closed else ("operational", False)
+
+
+def round_half_ft(x: float) -> float:
+    """Round to the nearest 0.5 ft (§5.6.3, LOCKED) -- depth is never reported at
+    finer precision than this anywhere, because the combined error budget (EPQS
+    vertical error + the per-town MHHW scalar approximation + Rutgers' extent having
+    been produced from a different elevation model) is on that order already."""
+    return round(x * 2) / 2.0
+
+
 def build_one_town(slug: str, town: str, mun: str, force: bool) -> dict:
     levels = town_levels(slug)
     assets = gpd.read_file(fl.PROCESSED / slug / "assets.geojson")
@@ -120,6 +176,11 @@ def build_one_town(slug: str, town: str, mun: str, force: bool) -> dict:
     assets_utm = assets.to_crs(fl.UTM18N)
     roads_utm = roads.to_crs(fl.UTM18N)
     access_by_asset = build_access_adjacency(assets_utm, roads_utm)
+
+    datum = load_datum(slug)
+    depth_available = bool(datum.get("depth_available"))
+    mhhw_navd88_ft = datum.get("mhhw_navd88_ft")
+    status_model = "4-tier" if depth_available else "3-tier"
 
     out_dir = WEB_DATA / slug
     (out_dir / "levels").mkdir(parents=True, exist_ok=True)
@@ -133,6 +194,11 @@ def build_one_town(slug: str, town: str, mun: str, force: bool) -> dict:
             print(f"  [SKIP] level {level} ft: no raw extent (run 04_fetch_hazard.py first)")
             continue
         extent_utm = gpd.read_file(raw_path).to_crs(fl.UTM18N).union_all()
+        # NOTE (timed 2026-08-11, pre-existing, not a Phase 7 regression): this buffer()
+        # on the raw, unsimplified extent is the dominant per-level cost (~4-5.5s for
+        # Newark's densest levels vs ~0.02s for the entire Phase 7 asset loop below) --
+        # it operates on the raw ~50k-vertex geometry before SIMPLIFY_M is applied
+        # further down. Confirmed via direct per-stage timing, not assumed.
         extent_tolerant = extent_utm.buffer(EXTENT_TOLERANCE_M)
 
         # --- roads (2-tier) ---
@@ -147,20 +213,38 @@ def build_one_town(slug: str, town: str, mun: str, force: bool) -> dict:
         closed_ids = set(closed_ids_ordered)
         roads_sparse = {rid: {"status": "closed"} for rid in closed_ids_ordered}
 
-        # --- assets (3-tier) ---
-        exposed_mask = assets_utm.geometry.within(extent_tolerant)
+        # --- assets: 4-tier (§5.3) if this town has a gated MHHW offset, else the
+        # original 3-tier extent-only model. Extent membership (in_extent) is always
+        # computed first and is always the primary signal in both models (§5.3 intro).
+        in_extent_mask = assets_utm.geometry.within(extent_tolerant)
+        wse_navd88_ft = (mhhw_navd88_ft + level) if depth_available else None
         assets_out: dict[str, dict] = {}
         for i, aid in enumerate(assets_utm["id"]):
-            if exposed_mask.iloc[i]:
-                status, access_lost = "exposed", True
+            in_extent = bool(in_extent_mask.iloc[i])
+            access_segs = access_by_asset.get(aid, [])
+            all_closed = bool(access_segs) and all(s in closed_ids for s in access_segs)
+            any_closed = any(s in closed_ids for s in access_segs)
+
+            if depth_available:
+                # §5.6.1: depth is computed ONLY inside the extent; outside it, d_ft
+                # is always exactly 0 -- never re-derived from the raw subtraction,
+                # never null. The extent stays the sole authority on whether a point
+                # is exposed at all; depth only ever answers how deep, and only inside
+                # a footprint Rutgers already drew.
+                ground_elev = assets_utm.iloc[i]["ground_elev_ft"]
+                if in_extent and ground_elev == ground_elev:  # NaN check (EPQS can fail)
+                    depth_ft = round_half_ft(max(0.0, wse_navd88_ft - ground_elev))
+                else:
+                    depth_ft = 0.0
+                ffo = float(assets_utm.iloc[i]["ffo_ft"])
+                status, access_lost = classify_asset_4tier(depth_ft, ffo, all_closed, any_closed)
             else:
-                access_segs = access_by_asset.get(aid, [])
-                access_lost = bool(access_segs) and all(s in closed_ids for s in access_segs)
-                status = "isolated" if access_lost else "operational"
-            assets_out[aid] = {"status": status, "access_lost": access_lost}
+                depth_ft = None
+                status, access_lost = classify_asset_3tier(in_extent, all_closed)
+
+            assets_out[aid] = {"status": status, "access_lost": access_lost, "depth_ft": depth_ft}
             if status != "operational" and first_exposed[aid] is None:
                 first_exposed[aid] = float(level)
-
         by_status: dict[str, int] = defaultdict(int)
         for v in assets_out.values():
             by_status[v["status"]] += 1
@@ -225,6 +309,14 @@ def build_one_town(slug: str, town: str, mun: str, force: bool) -> dict:
         "hazard_source": "Rutgers NJ Coastal Inundation Explorer (RU_NJ_CIE_Full)",
         "fim_mode": "extent-only",
         "roads_encoding": "sparse-closed-only",  # absence from a level's `roads` = open
+        # Phase 7 (§5.6/§7.2): per-town point-depth availability. depth_available=False
+        # towns are unaffected by Phase 7 -- status_model stays "3-tier", depth_ft is
+        # null everywhere for them (§5.6.4, a hard degradation path, not a toggle).
+        "depth_available": depth_available,
+        "status_model": status_model,
+        "mhhw_navd88_ft": mhhw_navd88_ft,
+        "datum_source": datum.get("datum_source"),
+        "ffo_default_ft": 1.0,
         "generated_utc": fl.utc_now(),
     }
     (out_dir / "index.json").write_text(json.dumps(index_json, indent=2), encoding="utf-8")

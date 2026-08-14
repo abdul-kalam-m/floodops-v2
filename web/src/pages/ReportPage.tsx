@@ -23,6 +23,7 @@ interface AssetRow {
   category: string;
   address: string;
   ground_elev_ft: number;
+  depth_ft: number | null;
   status: AssetStatus;
   access_lost: boolean;
   first_exposed: number | null;
@@ -74,6 +75,7 @@ export default function ReportPage() {
           category: String(p.category),
           address: String(p.address ?? ""),
           ground_elev_ft: Number(p.ground_elev_ft),
+          depth_ft: a?.depth_ft ?? null,
           status: a?.status ?? "operational",
           access_lost: a?.access_lost ?? false,
           first_exposed: firstExposed[id] ?? null,
@@ -170,15 +172,29 @@ export default function ReportPage() {
         <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-gray-700 sm:grid-cols-3">
           <Field label="County" value={index.county} />
           <Field label="Data generated" value={new Date(index.generated_utc).toLocaleString()} />
-          <Field label="Model" value="Extent-only exposure (no depth)" />
+          <Field
+            label="Model"
+            value={index.depth_available
+              ? "Extent + computed facility depth (this project's own estimate)"
+              : "Extent-only exposure (no depth)"}
+          />
+          {index.depth_available && index.datum_source && (
+            <Field
+              label="MHHW offset"
+              value={`${index.mhhw_navd88_ft?.toFixed(2)} ft NAVD88 (NOAA VDatum, cross-checked against ${index.datum_source.coops_station_name})`}
+            />
+          )}
         </dl>
       </header>
 
       {/* (2) Summary */}
       <section className="mb-6">
         <h2 className="mb-2 text-lg font-semibold text-gray-900">Summary</h2>
-        <div className="grid grid-cols-3 gap-3">
-          {(["exposed", "isolated", "operational"] as AssetStatus[]).map((s) => (
+        <div className={`grid gap-3 ${index.status_model === "4-tier" ? "grid-cols-4" : "grid-cols-3"}`}>
+          {(index.status_model === "4-tier"
+            ? (["exposed", "isolated", "access-threatened", "operational"] as AssetStatus[])
+            : (["exposed", "isolated", "operational"] as AssetStatus[])
+          ).map((s) => (
             <div key={s} className="rounded border border-gray-200 p-2 text-center">
               <div className="text-xl font-semibold tabular-nums">
                 {exposure.summary.by_asset_status[s] ?? 0}
@@ -205,6 +221,13 @@ export default function ReportPage() {
         <h2 className="mb-2 text-lg font-semibold text-gray-900">
           Affected facilities ({exposedRows.length})
         </h2>
+        {index.depth_available && (
+          <p className="mb-2 text-xs text-gray-500">
+            Depth is this project&rsquo;s own estimate (computed from Rutgers&rsquo; extent plus
+            USGS ground elevation), not part of Rutgers&rsquo; published model. Rounded to the
+            nearest 0.5 ft.
+          </p>
+        )}
         {exposedRows.length === 0 ? (
           <p className="text-sm text-gray-500">No facilities are exposed or isolated at this level.</p>
         ) : (
@@ -215,6 +238,7 @@ export default function ReportPage() {
                 <th className="py-1 pr-2">Category</th>
                 <th className="py-1 pr-2">Address</th>
                 <th className="py-1 pr-2 text-right">Elev (ft)</th>
+                {index.depth_available && <th className="py-1 pr-2 text-right">Depth (ft)</th>}
                 <th className="py-1 pr-2">Status</th>
                 <th className="py-1 pr-2">Access</th>
                 <th className="py-1 text-right">1st exposed (ft)</th>
@@ -227,6 +251,11 @@ export default function ReportPage() {
                   <td className="py-1 pr-2">{ASSET_CATEGORY_LABEL[r.category] ?? r.category}</td>
                   <td className="py-1 pr-2 text-gray-600">{r.address || "—"}</td>
                   <td className="py-1 pr-2 text-right tabular-nums">{r.ground_elev_ft.toFixed(1)}</td>
+                  {index.depth_available && (
+                    <td className="py-1 pr-2 text-right tabular-nums">
+                      {r.depth_ft != null ? r.depth_ft.toFixed(1) : "—"}
+                    </td>
+                  )}
                   <td className="py-1 pr-2">{ASSET_STATUS_LABEL[r.status]}</td>
                   <td className="py-1 pr-2">{r.access_lost ? "Lost" : "—"}</td>
                   <td className="py-1 text-right tabular-nums">

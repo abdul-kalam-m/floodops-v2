@@ -4,6 +4,128 @@ Newest entry on top. Never delete entries. Format per OPERATING_GUIDE.md §13.5 
 
 ---
 
+## 2026-08-14 — Phase 7: point depth (Tier 1) — full build, all sub-phases (agent: sonnet-5)
+
+**Executes Amendment A1/Part 1 (logged 2026-08-08 above) end to end** — the guide
+already specified this; this entry is the actual build. Session ran across a
+context/session boundary partway through; re-verified everything on resume rather
+than assuming prior-session state, per this project's own discipline.
+
+**7.0 — datum recon (`04b_fetch_datums.py`, new).** Two independent sources per
+town: NOAA VDatum (primary, point conversion at a real water point inside each
+town's own `extent_0.geojson`) + nearest NOAA CO-OPS station with a published
+NAVD88 datum (cross-check, searched against the full ~2,900-station
+waterlevels+historicwl catalog — the ~15-station "major stations" list the obvious
+first attempt reaches for is a poor proxy inside a bay/river town, off by 0.4-0.5 ft
+in testing). Gate: 0.25 ft agreement (§5.6.2). **7/8 towns pass; Camden fails** —
+not a disagreement, a genuine VDatum tidal-grid coverage gap over the
+Camden/Philadelphia Delaware River reach (confirmed via every disconnected part of
+Camden's own extent geometry plus 5 independent channel points, all returning
+VDatum's own server-side error, not a coverage sentinel). New Brunswick passes at
+the thinnest margin (0.242 ft of the 0.25 ft budget) with the largest cross-check
+distance (18.2 km) — flagged as worth a second look, not treated as a failure. Two
+real point-selection bugs found and fixed along the way (both now live in
+`floodops_v2_lib.town_water_candidates`): a MultiPolygon's `.centroid` can land in
+the gap between disconnected parts rather than on the geometry at all (broke 5/8
+towns initially); VDatum's own tidal grid has internal gaps even within one town's
+extent (Atlantic City: the largest part hit a real HTTP-200-with-`errorCode:412`
+server error, a smaller disconnected marsh part resolved fine) — fixed by trying
+every part, not just the largest. Full findings, the per-town offset table, and the
+real error-budget inputs (VDatum uncertainty 0.194–0.209 ft; VDatum/CO-OPS
+disagreement 0.008–0.242 ft) are in `RECON.md`.
+
+**7.1/7.2 — pipeline (`05_build_exposure.py`).** Added `load_datum()`,
+`round_half_ft()`, and two pure classification functions —
+`classify_asset_4tier()`/`classify_asset_3tier()` — extracted specifically so the
+worst-wins cascade (exposed ≥ isolated ≥ access-threatened ≥ operational, §5.3) is
+unit-testable directly rather than only exercised indirectly through a full town
+build. Real refinement over a first draft: the 4-tier model's `access_lost` field
+now reports the *actual* all-access-closed fact even in the `exposed` branch,
+instead of the 3-tier model's pre-Phase-7 convention of hardcoding `access_lost:
+true` whenever a facility is flooded — a facility can be genuinely flooded with its
+own roads still open, and now says so. `index.json` gained `depth_available`,
+`status_model`, `mhhw_navd88_ft`, `datum_source`, `ffo_default_ft` (§7.2). Ran for
+all 8 towns, all levels — **all within the §7.4 gzip budget** (worst case Newark,
+864.4 KB gzip of the 5 MB town cap).
+
+**7.3 — validator (`09_validate.py`).** Added: `depth_ft` format/non-negative-
+0.5-multiple checks, `exposed ⇔ depth ≥ ffo`, depth monotonicity, an exact
++1.0 ft-per-1 ft-level-step check (catches an inconsistently-applied MHHW offset
+cheaply), `depth_available:false` towns get null-depth/no-access-threatened checks,
+and the §5.6.5 disagreement-rate computation (reported per town × level, never
+pass/failed on — a high rate is a named finding, not a bug). **Hit one real bug
+fixing this in**: the committed, already-simplified+coordinate-rounded
+`extent_{level}.geojson` threw a genuine GEOS `TopologyException` on re-union for
+the disagreement-rate check — fixed with the same `buffer(0)` pattern
+`04_fetch_hazard.py` already uses for exactly this class of problem. **Full run: 0
+failures, all 8 towns.** `pytest`: 23/23 (7 new pure-function tests for the
+classification cascade, including a worst-wins-ordering test: depth between 0 and
+ffo *and* all access closed must resolve to `isolated`, not `access-threatened`).
+
+**Regression check (guide's own required §12.1 assertion, run once against the
+pre-Phase-7 committed `first_exposed.json` via `git show HEAD:...`):** 562 assets
+across 8 towns, **0 violations** — no asset's first-exposed level got later. 168
+(30%) got earlier (expected — `access-threatened` triggers on *any* closed access
+segment, strictly weaker than the old `isolated`'s *all*-closed requirement).
+Camden: 0 changes, exactly as expected (untouched 3-tier logic).
+
+**7.4 — web app.** `types.ts` (`AssetStatus` gains `access-threatened`, `depth_ft`
+on `AssetExposure`, `DatumSource`/`StatusModel` types, full `index.json` contract).
+`palette.ts` (reuses v1's exact 4-tier color tokens per the guide's §8 instruction —
+implementation convenience, not a portfolio signal). `Legend`/`SummaryCards`/
+`AssetTable` all made town-aware via a `statusModel`/`depthAvailable` prop rather
+than statically always showing 4 tiers — a 3-tier town's legend never shows a color
+that can't occur there. `AssetTable` gains a sortable Depth column, shown only for
+depth-available towns. `MapView`'s popup gains a depth row with its own "this
+project's own estimate, not Rutgers'" attribution line, omitted entirely (not
+"N/A") for towns without depth. `ReportPage` gains a depth column, an MHHW-offset
+report-header field, and a town-aware summary grid (3 vs. 4 columns). `csv.ts`
+gains `depth_ft`/`ffo_ft` columns, empty (not `"0"`) for non-depth towns.
+`DisclaimerText` rewritten to one unified paragraph — "the flood extents are
+Rutgers'; where facility depth is shown, it is not" — accurate whether or not the
+current town has depth, so it needs no per-town prop threaded through every call
+site. `MethodsPage` rewritten with a full "Facility depth" section (formula, error
+budget, the 0.25 ft gate, the disagreement-rate policy, the 0 ft/MHHW-baseline
+caveat) plus a **live** "Depth coverage by town" table that fetches all 8 towns'
+real `index.json` client-side rather than hardcoding coverage numbers that would
+drift the moment a town's datum status changes.
+
+**Verified, not assumed:** `tsc --noEmit`/`eslint .` both 0 errors (1 pre-existing
+unrelated `main.tsx` warning). Production build: 57.96 KB + 220.28 KB gzip (main +
+code-split MapLibre chunk) = 278.24 KB, comfortably under the 400 KB budget, no
+regression from the pre-Phase-7 split. Live dev-server checks: dashboard sidebar
+(`AssetTable` "Depth" column header confirmed via direct DOM query — it sits
+outside `<main>`, `get_page_text` alone wouldn't catch it; `SummaryCards`' 4-tier
+counts cross-checked byte-for-byte against the raw `exposure_10.json` for Newark);
+`/report?town=newark&level=10` (depth column, MHHW-offset field, every row's
+status/depth relationship internally consistent — e.g. every `Access threatened`
+row with `Access: —` has depth exactly 0.0, matching the "any-but-not-all closed"
+branch); `/methods` (full live coverage table matches `RECON.md`'s numbers exactly,
+including Camden's `No`/`—`/`—` row). 0 console errors on any page. Grepped for
+stray "FloodOps v1"/"FloodOps V2" in the new/changed web source — only hit was a
+pre-existing internal code comment, not rendered.
+
+**⚠ Deviations / open items:**
+- MapView's popup depth row was verified by code review + the identical data path
+  `AssetTable` already confirmed live (same `exposure.assets[id].depth_ft` field),
+  not by an actual pixel-level popup click in this session — this environment's
+  well-documented `requestAnimationFrame`-suspension issue (Phase 3-5 entry, and
+  again in the 2026-08-01 case-study entry) means MapLibre's `load` event may not
+  fire when the Browser pane isn't composited. Recommend a real-browser popup click
+  smoke test alongside the deploy, same standing recommendation as prior phases.
+- Camden ships without depth, correctly, but is a real product-facing asymmetry (7
+  of 8 towns show more detail than the 8th) — not something to "fix," per §5.6.4's
+  explicit design, but worth knowing before writing any case-study copy that implies
+  uniform coverage.
+- New Brunswick's thin datum-gate margin (0.242/0.25 ft) is flagged in `RECON.md`
+  but not gated on further — it passed the locked rule as written; revisiting the
+  rule itself is an owner decision, not something this build changed unilaterally.
+
+**Next:** owner reviews, then push + redeploy (same manual flow as prior phases).
+No further phases are defined in the guide beyond Phase 7.
+
+---
+
 ## 2026-08-11 — Display name: "FloodOps V2" → "FloodOps" in the deployed app only (owner decision, agent: sonnet-5)
 
 **Owner decision:** the deployed product should read as "FloodOps," not "FloodOps V2" —

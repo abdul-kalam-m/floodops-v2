@@ -155,5 +155,19 @@
   "hazard_source": "Rutgers NJ Coastal Inundation Explorer (RU_NJ_CIE_Full)",
   "fim_mode": "extent-only",
   "roads_encoding": "sparse-closed-only",
-  "generated_utc": "2026-08-01T10:01:59.305153+00:00"
+  "depth_available": true,
+  "status_model": "4-tier",
+  "mhhw_navd88_ft": 2.652,
+  "datum_source": {
+    "vdatum_ft": 2.652,
+    "vdatum_uncertainty_ft": 0.2,
+    "coops_station_id": "8531545",
+    "coops_station_name": "KEYPORT, RARITAN BAY",
+    "coops_dist_km": 9.0,
+    "coops_ft": 2.66,
+    "coops_epoch": "1983-2001",
+    "retrieved_utc": "2026-08-14T00:04:04.861051+00:00"
+  },
+  "ffo_default_ft": 1.0,
+  "generated_utc": "2026-08-14T00:40:41.474072+00:00"
 }

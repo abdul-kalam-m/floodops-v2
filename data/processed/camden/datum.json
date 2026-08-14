@@ -1,0 +1,20 @@
+{
+  "slug": "camden",
+  "town": "Camden",
+  "depth_available": false,
+  "water_point": [
+    -75.12339,
+    39.96019
+  ],
+  "mhhw_navd88_ft": null,
+  "datum_source": null,
+  "diagnostic": {
+    "vdatum_ft": null,
+    "coops_ft": 3.59,
+    "coops_station_id": "8545530",
+    "coops_station_name": "PHILADELPHIA (PIER 11 NORTH), DEL. RIVER",
+    "coops_dist_km": 1.48,
+    "diff_ft": null,
+    "reason": "no VDatum coverage at any candidate point in this town's MHHW extent"
+  }
+}

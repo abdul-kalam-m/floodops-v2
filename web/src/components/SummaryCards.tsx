@@ -1,12 +1,16 @@
-import type { AssetStatus, ExposureJson } from "../types";
+import type { AssetStatus, ExposureJson, StatusModel } from "../types";
 import { ASSET_COLORS, ASSET_STATUS_LABEL } from "../lib/palette";
 
-const STATUS_ORDER: AssetStatus[] = ["exposed", "isolated", "operational"];
+const STATUS_ORDER_3TIER: AssetStatus[] = ["exposed", "isolated", "operational"];
+const STATUS_ORDER_4TIER: AssetStatus[] = ["exposed", "isolated", "access-threatened", "operational"];
 
-export default function SummaryCards({ exposure }: { exposure: ExposureJson | null }) {
+export default function SummaryCards({
+  exposure, statusModel,
+}: { exposure: ExposureJson | null; statusModel: StatusModel }) {
   if (!exposure) return null;
   const s = exposure.summary;
-  const total = STATUS_ORDER.reduce((a, k) => a + (s.by_asset_status[k] ?? 0), 0);
+  const statusOrder = statusModel === "4-tier" ? STATUS_ORDER_4TIER : STATUS_ORDER_3TIER;
+  const total = statusOrder.reduce((a, k) => a + (s.by_asset_status[k] ?? 0), 0);
   const nonOperational = total - (s.by_asset_status.operational ?? 0);
 
   return (
@@ -19,7 +23,7 @@ export default function SummaryCards({ exposure }: { exposure: ExposureJson | nu
       <div>
         <p className="mb-1 text-xs font-medium text-gray-500">Facilities by status</p>
         <div className="space-y-1">
-          {STATUS_ORDER.map((k) => {
+          {statusOrder.map((k) => {
             const n = s.by_asset_status[k] ?? 0;
             return (
               <div key={k} className="flex items-center gap-2 text-sm">

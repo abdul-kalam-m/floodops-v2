@@ -1,6 +1,8 @@
-// §9 CSV export (V2 field list -- no depth_ft/category_label, unlike v1: this is an
-// exposure-only model with no depth, and there's no per-scenario category vocabulary
-// here; `town` and `hazard_source` replace those as the export-context fields).
+// §9 CSV export. Phase 7 (§5.6) added depth_ft/ffo_ft back into the export -- empty
+// (not "0") for depth_available:false towns, so a consumer can tell "not computed"
+// from a real zero-depth result. category_label (v1's flood-category label) stays
+// dropped -- there's no per-scenario category vocabulary here; `town` and
+// `hazard_source` are the export-context fields worth knowing instead.
 import type { ExposureJson, FirstExposedMap, GeoJson } from "../types";
 
 const CSV_COLUMNS = [
@@ -9,6 +11,8 @@ const CSV_COLUMNS = [
   "category",
   "address",
   "ground_elev_ft",
+  "depth_ft",
+  "ffo_ft",
   "status",
   "access_lost",
   "first_exposed_level_ft",
@@ -50,6 +54,8 @@ export function buildExposedAssetsCsv(
       p.category,
       p.address ?? "",
       p.ground_elev_ft,
+      a.depth_ft != null ? a.depth_ft : "",
+      a.depth_ft != null ? (p.ffo_ft ?? "") : "",
       a.status,
       a.access_lost,
       fe != null ? fe : "",

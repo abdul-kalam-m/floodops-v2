@@ -166,6 +166,7 @@ export default function MapView(props: Props) {
             "match", ["coalesce", ["feature-state", "status"], "operational"],
             "exposed", ASSET_COLORS.exposed,
             "isolated", ASSET_COLORS.isolated,
+            "access-threatened", ASSET_COLORS["access-threatened"],
             ASSET_COLORS.operational,
           ],
           "circle-stroke-color": "#ffffff",
@@ -240,10 +241,19 @@ export default function MapView(props: Props) {
 
   function popupHTML(a: AssetProps): string {
     const { exposure: exp, firstExposed: fe } = dataRef.current;
-    const status = exp?.assets[a.id]?.status ?? "operational";
+    const assetExp = exp?.assets[a.id];
+    const status = assetExp?.status ?? "operational";
     const color = ASSET_COLORS[status];
     const feLevel = fe[a.id];
     const cat = a.category.charAt(0).toUpperCase() + a.category.slice(1);
+    const depthFt = assetExp?.depth_ft;
+    // depth_ft is null for depth_available:false towns -- omit the row entirely
+    // rather than showing "N/A" (§8, per v1's own precedent). Attribute it as this
+    // project's own computation, not Rutgers' -- the seam the guide's honesty
+    // discipline requires staying legible everywhere depth appears.
+    const depthRow = depthFt == null ? "" : `
+          <tr><td style="color:#6b7280; padding:1px 0">Depth (computed)</td>
+              <td style="text-align:right; font-variant-numeric:tabular-nums">${depthFt.toFixed(1)} ft</td></tr>`;
     return `
       <div style="font:13px system-ui, sans-serif; min-width:180px">
         <div style="font-weight:600; font-size:14px; margin-bottom:2px">${a.name}</div>
@@ -252,10 +262,11 @@ export default function MapView(props: Props) {
              background:${color}; font-weight:600; margin-bottom:6px">${ASSET_STATUS_LABEL[status]}</div>
         <table style="width:100%; border-collapse:collapse">
           <tr><td style="color:#6b7280; padding:1px 0">Ground elev.</td>
-              <td style="text-align:right; font-variant-numeric:tabular-nums">${a.ground_elev_ft.toFixed(1)} ft</td></tr>
+              <td style="text-align:right; font-variant-numeric:tabular-nums">${a.ground_elev_ft.toFixed(1)} ft</td></tr>${depthRow}
           <tr><td style="color:#6b7280; padding:1px 0">First exposed at</td>
               <td style="text-align:right; font-variant-numeric:tabular-nums">${feLevel == null ? "—" : feLevel + " ft"}</td></tr>
         </table>
+        ${depthFt != null ? `<div style="color:#9ca3af; font-size:10px; margin-top:4px">Depth is this project's own estimate, not Rutgers'.</div>` : ""}
       </div>`;
   }
 

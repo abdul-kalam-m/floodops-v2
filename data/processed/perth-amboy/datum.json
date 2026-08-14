@@ -1,0 +1,29 @@
+{
+  "slug": "perth-amboy",
+  "town": "Perth Amboy",
+  "depth_available": true,
+  "water_point": [
+    -74.27359,
+    40.49721
+  ],
+  "mhhw_navd88_ft": 2.652,
+  "datum_source": {
+    "vdatum_ft": 2.652,
+    "vdatum_uncertainty_ft": 0.2,
+    "coops_station_id": "8531545",
+    "coops_station_name": "KEYPORT, RARITAN BAY",
+    "coops_dist_km": 9.0,
+    "coops_ft": 2.66,
+    "coops_epoch": "1983-2001",
+    "retrieved_utc": "2026-08-14T00:04:04.861051+00:00"
+  },
+  "diagnostic": {
+    "vdatum_ft": 2.652,
+    "coops_ft": 2.66,
+    "coops_station_id": "8531545",
+    "coops_station_name": "KEYPORT, RARITAN BAY",
+    "coops_dist_km": 9.0,
+    "diff_ft": -0.008,
+    "reason": "pass"
+  }
+}

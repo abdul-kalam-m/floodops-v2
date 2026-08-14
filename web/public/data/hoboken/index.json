@@ -155,5 +155,19 @@
   "hazard_source": "Rutgers NJ Coastal Inundation Explorer (RU_NJ_CIE_Full)",
   "fim_mode": "extent-only",
   "roads_encoding": "sparse-closed-only",
-  "generated_utc": "2026-08-01T09:53:16.808268+00:00"
+  "depth_available": true,
+  "status_model": "4-tier",
+  "mhhw_navd88_ft": 2.303,
+  "datum_source": {
+    "vdatum_ft": 2.303,
+    "vdatum_uncertainty_ft": 0.209,
+    "coops_station_id": "8518750",
+    "coops_station_name": "The Battery",
+    "coops_dist_km": 5.21,
+    "coops_ft": 2.28,
+    "coops_epoch": "1983-2001",
+    "retrieved_utc": "2026-08-14T00:03:47.909498+00:00"
+  },
+  "ffo_default_ft": 1.0,
+  "generated_utc": "2026-08-14T00:36:13.710299+00:00"
 }

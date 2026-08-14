@@ -1,0 +1,29 @@
+{
+  "slug": "atlantic-city",
+  "town": "Atlantic City",
+  "depth_available": true,
+  "water_point": [
+    -74.41899,
+    39.35833
+  ],
+  "mhhw_navd88_ft": 1.999,
+  "datum_source": {
+    "vdatum_ft": 1.999,
+    "vdatum_uncertainty_ft": 0.194,
+    "coops_station_id": "8534720",
+    "coops_station_name": "Atlantic City",
+    "coops_dist_km": 0.2,
+    "coops_ft": 1.99,
+    "coops_epoch": "1983-2001",
+    "retrieved_utc": "2026-08-14T00:03:55.043840+00:00"
+  },
+  "diagnostic": {
+    "vdatum_ft": 1.999,
+    "coops_ft": 1.99,
+    "coops_station_id": "8534720",
+    "coops_station_name": "Atlantic City",
+    "coops_dist_km": 0.2,
+    "diff_ft": 0.009,
+    "reason": "pass"
+  }
+}

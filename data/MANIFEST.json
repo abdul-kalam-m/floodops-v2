@@ -2048,6 +2048,50 @@
       "sha256": "d2d6f4639075c1a2fa2e0396a63186c0fd1ccf6de2b57d5034800351a0b5de4e",
       "local_path": "data\\processed\\bayonne\\roads.geojson",
       "license_note": "OpenStreetMap contributors, ODbL"
+    },
+    {
+      "name": "mhhw_navd88_offset_hoboken",
+      "source_url": "https://vdatum.noaa.gov/vdatumweb/api/convert (primary) + https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/8518750/datums.json (cross-check)",
+      "retrieved_utc": "2026-08-14T00:03:47.917956+00:00",
+      "sha256": "f718f7a4d546ab39e7884d1bc47551b42d424ad76dce783fb1c62bc0bba08171",
+      "local_path": "data\\processed\\hoboken\\datum.json",
+      "license_note": "NOAA VDatum / NOAA CO-OPS, public domain",
+      "mhhw_navd88_ft": 2.303,
+      "coops_station_id": "8518750",
+      "diff_ft": 0.023
+    },
+    {
+      "name": "mhhw_navd88_offset_atlantic-city",
+      "source_url": "https://vdatum.noaa.gov/vdatumweb/api/convert (primary) + https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/8534720/datums.json (cross-check)",
+      "retrieved_utc": "2026-08-14T00:03:55.049495+00:00",
+      "sha256": "2f8d1e492b848bfaa72ace41e3aec438a82db2600d5b76733f02d5ef99ae39f3",
+      "local_path": "data\\processed\\atlantic-city\\datum.json",
+      "license_note": "NOAA VDatum / NOAA CO-OPS, public domain",
+      "mhhw_navd88_ft": 1.999,
+      "coops_station_id": "8534720",
+      "diff_ft": 0.009
+    },
+    {
+      "name": "mhhw_navd88_offset_perth-amboy",
+      "source_url": "https://vdatum.noaa.gov/vdatumweb/api/convert (primary) + https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/8531545/datums.json (cross-check)",
+      "retrieved_utc": "2026-08-14T00:04:04.870084+00:00",
+      "sha256": "8200936ebc8b7bc6fe02e57411a3dd4005d8ccb3af54ffaf3f40d60f3cd0a6ec",
+      "local_path": "data\\processed\\perth-amboy\\datum.json",
+      "license_note": "NOAA VDatum / NOAA CO-OPS, public domain",
+      "mhhw_navd88_ft": 2.652,
+      "coops_station_id": "8531545",
+      "diff_ft": -0.008
+    },
+    {
+      "name": "mhhw_navd88_offset_bayonne",
+      "source_url": "https://vdatum.noaa.gov/vdatumweb/api/convert (primary) + https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/8530772/datums.json (cross-check)",
+      "retrieved_utc": "2026-08-14T00:04:30.140614+00:00",
+      "sha256": "03b0692aba4e33e9fc59095aa02b42ce6b9bc1fb296ae72a935e9f11c3ca8b8d",
+      "local_path": "data\\processed\\bayonne\\datum.json",
+      "license_note": "NOAA VDatum / NOAA CO-OPS, public domain",
+      "mhhw_navd88_ft": 2.683,
+      "coops_station_id": "8530772",
+      "diff_ft": -0.017
     }
   ]
 }

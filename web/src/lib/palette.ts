@@ -1,11 +1,19 @@
 // Okabe-Ito-based, colorblind-safe status palette (v1's convention, reused).
-// V2's vocabulary is deliberately coarser than v1's (§5.3/§5.4, extent-only, no depth):
-// 3-tier asset status, 2-tier road status, ONE exposure-fill color (not a 4-class depth
-// ramp) -- never reuse v1's DEPTH_COLORS concept here, there is no depth to shade by.
+// Road status stays 2-tier and the map fill stays single-class (not v1's 4-class
+// depth ramp) regardless of a town's depth availability -- roads never get a
+// computed depth (§2.2, locked), and the ramp is locked out for payload reasons
+// (§7.4), not portfolio-distinguishability. Asset status now has 4 possible values
+// for depth_available towns (§5.3) -- reuses v1's own 4-tier color tokens verbatim
+// (implementation convenience, same design-token source already shared per §6.2;
+// NOT a portfolio-pairing signal, see the guide's §16 changelog). The worst tier
+// keeps V2's pre-existing "exposed" label rather than adopting v1's
+// "facility-flooded" -- already shipped in the CSV/URL/report vocabulary before
+// Phase 7, and its condition now matches v1's facility-flooded exactly (§5.3).
 import type { AssetStatus, RoadStatus } from "../types";
 
 export const ASSET_COLORS: Record<AssetStatus, string> = {
   operational: "#009E73",
+  "access-threatened": "#E69F00",
   isolated: "#CC79A7",
   exposed: "#D55E00",
 };
@@ -17,6 +25,7 @@ export const ROAD_COLORS: Record<RoadStatus, string> = {
 
 export const ASSET_STATUS_LABEL: Record<AssetStatus, string> = {
   operational: "Operational",
+  "access-threatened": "Access threatened",
   isolated: "Isolated",
   exposed: "Exposed",
 };

@@ -183,7 +183,7 @@ export default function App() {
         >
           <LayerToggle visibility={visibility} onChange={setVisibility} />
           <div className="border-t border-gray-100 pt-3">
-            <SummaryCards exposure={exposure} />
+            <SummaryCards exposure={exposure} statusModel={index.status_model} />
           </div>
           <div className="border-t border-gray-100 pt-3">
             <ReportButtons
@@ -202,6 +202,7 @@ export default function App() {
               assetsGeo={assetsGeo}
               exposure={exposure}
               firstExposed={firstExposed}
+              statusModel={index.status_model}
               selectedAssetId={selectedAssetId}
               onSelect={onSelectAsset}
             />
@@ -233,7 +234,7 @@ export default function App() {
           <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-3">
             <div className="flex justify-end">
               <div className="pointer-events-auto w-44">
-                <Legend />
+                <Legend statusModel={index.status_model} />
               </div>
             </div>
             <div className="pointer-events-auto mx-auto w-full max-w-xl">
