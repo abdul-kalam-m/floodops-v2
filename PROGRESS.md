@@ -4,6 +4,44 @@ Newest entry on top. Never delete entries. Format per OPERATING_GUIDE.md §13.5 
 
 ---
 
+## 2026-08-14 — CASE-STUDY.md stats refresh, real Phase 7 numbers (owner + agent: sonnet-5)
+
+**Closes the item flagged in the entry below** (the warning banner left on the Facts
+section rather than silently rewriting stale numbers). Recomputed every exposure stat
+fresh from the committed data, not carried forward:
+
+- **Per-town affected/total at 20 ft**, pulled directly from each town's `index.json` +
+  `levels/exposure_20.json`: Hoboken 33/33 (100%), Atlantic City 46/46 (100%), Camden
+  62/90 (69%, 3-tier), Bayonne 23/35 (66%), Jersey City 49/111 (44%), Perth Amboy
+  10/32 (31%), Newark 41/177 (23%), New Brunswick 3/38 (8%). Hoboken/Atlantic City's
+  100% claims held up unchanged; Newark's old "32/177" was a real undercount from the
+  pre-Phase-7 3-tier model (missed the 11 facilities that are now `access-threatened`
+  from partial road closures, not full flooding).
+- **New Brunswick's story changed in a genuinely interesting way, not just a bigger
+  number:** old copy said "shows 0." Real Phase 7 number is 0 facilities *directly*
+  inside the flood extent, but 3 facilities `access-threatened` purely from nearby
+  road closures — the tool now distinguishes "your building floods" from "your street
+  floods and you can't get out," and New Brunswick is the town where that distinction
+  is the whole story.
+- **Added the §5.6.5 disagreement-rate finding as its own Fact bullet** (44/147
+  town-level combinations flagged, real pattern at each town's low-exposure levels,
+  not noise) — this was already fully documented in `RECON.md`'s Phase 7.2/7.3 section
+  from the original build but hadn't made it into the case-study draft yet.
+- **Added the datum-recon technical narrative** (the ~2,900-station CO-OPS catalog
+  fix, the MultiPolygon-centroid-in-a-gap bug, VDatum's real `errorCode:412` coverage
+  gap) as its own Fact bullet — same standard as the existing "real methodology fix"
+  bullets already in this file, just for Phase 7's own real debugging story.
+- Updated the Hero section (added a depth-specific second option: Newark Liberty Intl,
+  15.5 ft) and the screenshot repro steps (32→41 for Newark) to match.
+- "Numbers verified" section rewritten to cite the actual re-verification done this
+  pass (which `index.json`/`exposure_20.json` fields, which `PROGRESS.md`/`RECON.md`
+  entries) rather than only the original 2026-08-01 sources.
+
+**⚠ Deviations / open items:** none new. This closes the "Explicitly NOT refreshed"
+item from the entry below.
+
+---
+
 ## 2026-08-14 — Live-deploy verification (Phase 7) + live URL added to docs (owner + agent: opus-5)
 
 **Live-deploy verification, real findings, not assumed from the local build.** Checked
