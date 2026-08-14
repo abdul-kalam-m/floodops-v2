@@ -3,7 +3,7 @@
 **Project:** FloodOps V2 — Multi-Municipality Coastal Flood Exposure Explorer (New Jersey)
 **Owner:** Abdul Kalam Azad Mustaq (ar.abdulkalam.mustaq@gmail.com)
 **Guide version:** 1.1 — written 2026-07-22, amended 2026-08-08 (Amendment A1 — see §16 Changelog)
-**Status:** Phases 0–7 complete (built locally 2026-08-14; not yet pushed/redeployed — see `PROGRESS.md`). 7/8 towns have computed facility depth (Camden ships extent-only, §5.6.4 — a real VDatum coverage gap, not a disagreement). Deployed production still reflects pre-Phase-7 state (Cloudflare Workers, `floodops-v2` repo, `github.com/abdul-kalam-m/floodops-v2`) until pushed.
+**Status:** Phases 0–7 complete and verified live in production. 7/8 towns have computed facility depth (Camden ships extent-only, §5.6.4 — a real VDatum coverage gap, not a disagreement). **Live:** https://floodops-v2.ar-abdulkalam-mustaq.workers.dev/ (Cloudflare Workers). Repo: `github.com/abdul-kalam-m/floodops-v2`.
 **Guide location (canonical):** `C:\Users\abdul\Desktop\Temporary Files\RUTGERS\6. PORTFOLIO\10. FLOODOPS V2\OPERATING_GUIDE.md`
 **Prior project (internal reference only):** FloodOps v1 (`4. FLOODOPS\`, repo `C:\Users\abdul\Documents\GitHub\floodops`) established the design tokens, testing philosophy, and agent protocol this guide reuses — read its guide for those conventions; this guide only specifies what's **new or different**. **V1 and V2 are independent products with independent shipping decisions. No instruction in this guide assumes v1 is published, live, or presented alongside V2** — that assumption was retired 2026-08-08 (§16).
 

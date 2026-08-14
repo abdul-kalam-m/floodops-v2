@@ -14,11 +14,21 @@ decision is made. All numbers below are pulled directly from this repo's own
 ### FloodOps V2 — `data-ai` (or `geospatial-intelligence`), candidate flagship
 
 **Hook:** A multi-town coastal flood *exposure* explorer for New Jersey — honest about
-what a statewide static model can and can't tell you, on purpose. Presented as a pair
-with FloodOps v1 (one deep, gauge-anchored river simulation vs. one broad,
-state-open-data-anchored coastal exposure screen).
+what a statewide static model can and can't tell you, on purpose. Stands as its own
+project (not part of a portfolio pair) — a registry-driven, multi-town dashboard on a
+real statewide open-data product, with disclosed, quantified uncertainty in its
+per-facility depth estimates (see `OPERATING_GUIDE.md` §16 for the positioning history).
 
-**Facts:**
+**⚠ Stats below predate Phase 7 (point depth, added 2026-08-11/14) — re-verify against
+current `PROGRESS.md`/`RECON.md` before quoting anywhere.** Phase 7 added a 4th facility
+status (`access-threatened`) for 7 of 8 towns, which changes the "ever non-operational"
+counts below (e.g. Newark's affected-facility count is now 41, not 32 — the old figure
+undercounts because it predates the tier that catches partial road closures). The
+"extent-only, no depth model" framing in the next bullet is also no longer accurate
+for those 7 towns. Left as-is here rather than silently rewritten, since refreshing
+every number below is a bigger job than this pass covers.
+
+**Facts (pre-Phase-7 snapshot — see warning above):**
 - 8 NJ coastal/tidal municipalities: Newark, Hoboken, Jersey City, Atlantic City, New
   Brunswick, Perth Amboy, Camden, Bayonne. 21 water levels per town (0–20 ft above
   Mean Higher High Water, whole-foot steps) against Rutgers University's NJ Coastal
@@ -44,17 +54,16 @@ state-open-data-anchored coastal exposure screen).
 - Static-only architecture, zero backend: Python/GeoPandas pipeline precomputes every
   town × level combination into committed JSON/GeoJSON; Vite + React 18 + TypeScript +
   Tailwind v4 + MapLibre GL frontend reads it directly. Deployed on Cloudflare Workers
-  (static assets), independent of v1's own Cloudflare Pages project.
+  (static assets).
 - Accessibility: 0 axe-core violations (dashboard, report, methods pages) after a real
   scan-and-fix pass, not just an unverified claim — found and fixed 5 real issues,
   including a thin-margin color-contrast bug that only failed on the map's translucent
   overlay panels, not on solid-white backgrounds, caught by rescanning a second town.
 - **Source:** `C:\Users\abdul\Documents\GitHub\floodops-v2` (`PROGRESS.md` is the full,
   dated build log — every fact above is traceable to a specific entry there).
-- **Live URL:** pending final owner deploy confirmation (Cloudflare Workers project
-  `floodops-v2` — owner is finishing that step as of this writing; update once live).
+- **Live URL:** https://floodops-v2.ar-abdulkalam-mustaq.workers.dev/ (Cloudflare Workers).
 
-**Hero:** interactive MapLibre view is the natural hero, same pattern as v1. Suggested
+**Hero:** interactive MapLibre view is the natural hero. Suggested
 shot: Hoboken at the 20 ft scenario (`/#town=hoboken&level=20`) — every facility marker
 shows exposed (orange), the modeled-extent fill visibly covers most of the town, dashed
 boundary line legible against it. This single frame carries the "100% of Hoboken
@@ -72,7 +81,7 @@ disk (the screenshot tool returns an image for inline viewing, not a file). Rath
 fabricate placeholder images or claim screenshots exist when they don't, capturing the
 following is left as a real 10-minute task for whoever builds the actual case-study page:
 
-1. **Hero shot** — `https://<live-v2-url>/#town=hoboken&level=20`. Verified live this
+1. **Hero shot** — `https://floodops-v2.ar-abdulkalam-mustaq.workers.dev/#town=hoboken&level=20`. Verified live this
    session (not guessed): every facility renders orange (exposed), blue modeled-extent
    fill covers most of the town, black dashed boundary line clearly legible against it,
    legend fully visible. This exact frame was seen and confirmed correct during this
@@ -81,10 +90,10 @@ following is left as a real 10-minute task for whoever builds the actual case-st
    facilities exposed (Port Newark, Newark Liberty Intl among them), visible amid a much
    larger built-up area than Hoboken.
 3. **Methods-page limitations screenshot** (explicit portfolio-guide instruction, §14) —
-   `https://<live-v2-url>/methods`, the "What this tool does *not* compute" section in
+   `https://floodops-v2.ar-abdulkalam-mustaq.workers.dev/methods`, the "What this tool does *not* compute" section in
    particular — this is the direct visual evidence of the honesty discipline the guide
    asks for.
-4. **Report page** — `https://<live-v2-url>/report?town=newark&level=20` — shows the
+4. **Report page** — `https://floodops-v2.ar-abdulkalam-mustaq.workers.dev/report?town=newark&level=20` — shows the
    operations-report format (summary counts, affected-facilities table, prepositioning
    watchlist) in a clean, static, always-renders-correctly view (no MapLibre dependency,
    verified repeatedly this session to render reliably).

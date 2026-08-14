@@ -4,6 +4,71 @@ Newest entry on top. Never delete entries. Format per OPERATING_GUIDE.md §13.5 
 
 ---
 
+## 2026-08-14 — Live-deploy verification (Phase 7) + live URL added to docs (owner + agent: opus-5)
+
+**Live-deploy verification, real findings, not assumed from the local build.** Checked
+`https://floodops-v2.ar-abdulkalam-mustaq.workers.dev/#town=newark&level=20` in a real
+browser against production, not just the local dev server used for earlier Phase 7
+checks. Confirmed live and correct: Newark's `index.json` returns
+`depth_available:true, mhhw_navd88_ft:2.649` matching `RECON.md` exactly; real per-asset
+depths present in `exposure_20.json` (e.g. Newark Liberty Intl = 15.5 ft); AssetTable's
+Depth column, the 4-way status filter, and the Legend all render correctly; Camden
+correctly serves `depth_available:false, status_model:"3-tier", mhhw_navd88_ft:null`
+with no Depth column and no "Access threatened" filter option; `/report` for both towns
+matches (Newark shows the MHHW-offset field + Depth column + updated disclaimer, Camden
+shows "Extent-only exposure (no depth)" with neither); `/methods` correctly live-fetches
+all 8 towns' `index.json` to build its per-town depth-coverage table (confirmed via
+network log — 8 separate requests, not hardcoded). Zero console errors, all network
+requests 200, across every page checked.
+
+**One thing not directly confirmed: the MapLibre popup's depth row.** Same
+`requestAnimationFrame`-suspension limitation documented repeatedly in this file
+(Phase 3-5 entry, Phase 6 case-study entry) — confirmed again this session at the
+browser-engine level: overriding `document.hidden`/`visibilityState` via
+`Object.defineProperty` and dispatching `visibilitychange` did **not** unstick RAF (0
+ticks in 3 s), meaning this is enforced below JS, not a flag this session's page code
+can spoof. Verified the popup's data path indirectly instead: pulled the same
+`depth_ft` value the popup template reads (15.5 ft, Newark Liberty Intl) directly from
+the live API, matching the already-visually-confirmed AssetTable value for the same
+asset via the same field. `popupHTML()` is simple string interpolation with no other
+logic, so this is solid evidence, not a guess, but it is not a pixel confirmation.
+Recommend the owner click one exposed facility live to close this out, same
+recommendation pattern as the Phase 3-5 entry.
+
+**Docs updated to reference the live URL** (owner explicitly requested map depth ramp
+stay out of scope, §16/Phase 8 territory if ever revisited — not done here):
+- `README.md`: added the live URL up top; fixed the disclaimer quote (was pre-Phase-7,
+  claimed "does not compute flood depth" unconditionally — no longer true for 7/8
+  towns); fixed the Status section (was still "Phases 0-5... Pending: Cloudflare Pages
+  deployment," stale since the Phase 6 Workers-not-Pages deploy).
+- `case-study/CASE-STUDY.md`: filled in the `<live-v2-url>` placeholders (4 spots) and
+  the "Live URL: pending..." line with the real URL.
+- **Also found and fixed while touching both files: leftover "presented as a pair with
+  FloodOps v1" / "independent of v1's own Cloudflare Pages project" language in both
+  README.md and CASE-STUDY.md** — a real gap in the earlier pairing-narrative retirement
+  (2026-08-08 entry, then the branding-fix entry) that missed these two files. Fixed as
+  straightforward §13.4 compliance, not a new content decision.
+- **Explicitly NOT refreshed:** CASE-STUDY.md's "Facts" bullet list (exposure
+  percentages, 3-tier framing) predates Phase 7 and is now stale — e.g. Newark's
+  affected-facility count is quoted there as 32, but the live report shows 41 (the old
+  3-tier model undercounts, since `access-threatened` — Phase 7 — catches partial
+  road-closure cases the 3-tier model silently counted as operational). Flagged inline
+  in the file with a warning banner rather than silently left wrong or silently
+  rewritten — refreshing every stat is a bigger job than this pass covers.
+- GitHub repo `homepage` field set to the live URL via `gh api` (was `null`) — the
+  repo's own "About" link on github.com now points at the live demo, not just the
+  README text.
+- `OPERATING_GUIDE.md` Status line corrected (previously said "not yet
+  pushed/redeployed," stale since the Phase 7 push+deploy); now states the live URL
+  directly. Re-synced to the canonical portfolio copy, confirmed byte-identical.
+
+**⚠ Deviations / open items:** the MapLibre popup depth row (above) is the one
+Phase 7 surface not pixel-verified in production. CASE-STUDY.md's Facts section needs
+a real refresh pass against current `RECON.md`/live report numbers before it's used
+anywhere — flagged, not fixed, this session.
+
+---
+
 ## 2026-08-14 — Phase 7: point depth (Tier 1) — full build, all sub-phases (agent: sonnet-5)
 
 **Executes Amendment A1/Part 1 (logged 2026-08-08 above) end to end** — the guide
