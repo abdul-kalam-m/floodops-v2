@@ -5,20 +5,20 @@ import {
   ASSET_COLORS, ASSET_STATUS_LABEL, BOUNDARY_COLOR, EXPOSURE_FILL_COLOR, ROAD_COLORS,
 } from "../lib/palette";
 
-// Resilient raster basemap (Carto Positron), same choice as v1. Each tile is
-// independent, so the app stays usable if the basemap is unreachable (§8.6).
+// Resilient raster basemap (Esri World Light Gray Canvas). Replaced Carto
+// Positron, which now watermarks keyless requests. Each tile is independent,
+// so the app stays usable if the basemap is unreachable (§8.6).
 const BASE_STYLE: StyleSpecification = {
   version: 8,
   sources: {
     basemap: {
       type: "raster",
       tiles: [
-        "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-        "https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-        "https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+        "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
       ],
+      maxzoom: 16,
       tileSize: 256,
-      attribution: "© OpenStreetMap contributors © CARTO",
+      attribution: "Tiles © Esri — Esri, HERE, Garmin, © OpenStreetMap contributors",
     },
   },
   layers: [
